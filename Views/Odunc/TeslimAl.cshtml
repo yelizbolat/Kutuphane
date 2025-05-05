@@ -1,0 +1,38 @@
+@model Kutuphane.Models.OduncKitap
+
+@{
+    ViewData["Title"] = "Kitap Teslim Al";
+}
+
+<h1>Kitap Teslim Al</h1>
+
+<h3>Bu kitabı teslim almak istediğinizden emin misiniz?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Kitap Adı
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Kitap.KitapAdi)
+        </dd>
+        <dt class="col-sm-2">
+            Öğrenci
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Ogrenci.OgrenciAdi) @Html.DisplayFor(model => model.Ogrenci.OgrenciSoyadi)
+        </dd>
+        <dt class="col-sm-2">
+            Ödünç Alma Tarihi
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.OduncAlmaTarihi)
+        </dd>
+    </dl>
+
+    <form asp-action="TeslimAl">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Teslim Al" class="btn btn-success" />
+        <a asp-action="Index" class="btn btn-secondary">Listeye Dön</a>
+    </form>
+</div> 
