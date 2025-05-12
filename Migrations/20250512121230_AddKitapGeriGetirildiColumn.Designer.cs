@@ -3,6 +3,7 @@ using System;
 using Kutuphane.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kutuphane.Migrations
 {
     [DbContext(typeof(KutuphaneDbContext))]
-    partial class KutuphaneDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250512121230_AddKitapGeriGetirildiColumn")]
+    partial class AddKitapGeriGetirildiColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.4");
@@ -118,10 +121,6 @@ namespace Kutuphane.Migrations
                     b.Property<DateTime>("EklenmeTarihi")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("KitapAdi")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<bool>("KitapGeriGetirildi")
                         .HasColumnType("INTEGER");
 
@@ -142,9 +141,6 @@ namespace Kutuphane.Migrations
 
                     b.Property<int?>("SinifId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("TeslimTarihi")
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 

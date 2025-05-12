@@ -30,18 +30,24 @@ namespace Kutuphane.Controllers
             ViewBag.Siniflar = new SelectList(await _context.Siniflar.ToListAsync(), "Id", "SinifAdi");
             return View();
         }
-        // POST: Ogrenci/Create
+
+        // POST: Ogrenci/Ekle
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Ekle(Ogrenci ogrenci)
         {
-             if (ModelState.IsValid)
+            if (_context.Ogrenciler.Any(o => o.OkulNumarasi == ogrenci.OkulNumarasi))
+            {
+                ModelState.AddModelError("OkulNo", "Bu okul numarası zaten kayıtlı.");
+            }
+
+            if (ModelState.IsValid)
             {
                 _context.Ogrenciler.Add(ogrenci);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-           ViewBag.Siniflar = new SelectList(await _context.Siniflar.ToListAsync(), "Id", "SinifAdi");
+            ViewBag.Siniflar = new SelectList(await _context.Siniflar.ToListAsync(), "Id", "SinifAdi");
             return View(ogrenci);
         }
 
@@ -59,6 +65,11 @@ namespace Kutuphane.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Guncelle(Ogrenci ogrenci)
         {
+            if (_context.Ogrenciler.Any(o => o.OkulNumarasi == ogrenci.OkulNumarasi && o.Id != ogrenci.Id))
+            {
+                ModelState.AddModelError("OkulNo", "Bu okul numarası başka bir öğrenciye ait.");
+            }
+
             if (!ModelState.IsValid)
             {
                 ViewBag.Siniflar = new SelectList(await _context.Siniflar.ToListAsync(), "Id", "SinifAdi");
@@ -69,6 +80,7 @@ namespace Kutuphane.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Sil(int id)

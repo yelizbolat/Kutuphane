@@ -22,6 +22,8 @@ namespace Kutuphane.Models
         public Kategori? Kategori { get; set; }
 
         public bool OduncVerildiMi { get; set; } = false;
+        public int? OgrenciId { get; set; }  // Kitap ödünç alınan öğrenci
+        public DateTime? OduncTarihi { get; set; }  // Kitap ödünç alma tarihi
         public DateTime EklenmeTarihi { get; set; } = DateTime.Now;
     }
 }

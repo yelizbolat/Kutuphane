@@ -1,8 +1,76 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Ana Sayfa";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h2 class="mb-4">Kütüphane</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Toplam Öğrenci</h5>
+                <p class="card-text display-6"></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Toplam Kitap</h5>
+                <p class="card-text display-6"></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Ödünç Verilen Kitap</h5>
+                <p class="card-text display-6"></p>
+            </div>
+        </div>
+    </div>
 </div>
+@model List<Ogrenci>
+
+<h4>15 Gün Üzerinde Teslim Etmeyen Öğrenciler</h4>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Öğrenci Adı</th>
+            <th>Kitap Adı</th>
+            <th>Alınma Tarihi</th>
+            <th>Teslim Tarihi</th>
+            <th>Gerçek Teslim Tarihi</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.OgrenciAdi</td>
+            <td>@item.KitapAdi</td>
+            <td>
+                @if (item.KitapOduncTarihi.HasValue)
+                {
+                    @item.KitapOduncTarihi.Value.ToString("dd/MM/yyyy")
+                }
+                else
+                {
+                    <span class="text-danger">Ödünç Alınmadı</span>
+                }
+            </td>
+            <td>
+                @if (item.TeslimTarihi.HasValue)
+                {
+                    @item.TeslimTarihi.Value.ToString("dd/MM/yyyy")
+                }
+                else
+                {
+                    <span class="text-danger">Teslim Edilmedi</span>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

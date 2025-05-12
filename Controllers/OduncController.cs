@@ -49,7 +49,17 @@ namespace Kutuphane.Controllers
                     return Json(new { success = false, message = "Lütfen kitap ve öğrenci seçiniz." });
                 }
 
-                // Kitabın ödünç verilip verilmediğini kontrol et
+                // ✅ Öğrencinin gecikmiş ve teslim edilmemiş kitabı var mı?
+                var teslimEtmemisMi = await _context.OduncKitaplar
+                    .AnyAsync(o => o.OgrenciId == oduncKitap.OgrenciId && !o.TeslimDurumu && o.OduncAlmaTarihi.AddDays(15) < DateTime.Now);
+
+                if (teslimEtmemisMi)
+                {
+                    _logger.LogWarning("Öğrencinin henüz teslim etmediği geçikmiş kitabı var. OgrenciId: {OgrenciId}", oduncKitap.OgrenciId);
+                    return Json(new { success = false, message = "Bu öğrencinin teslim etmediği geçikmiş kitabı bulunuyor. Yeni kitap verilemez." });
+                }
+
+                // ✅ Kitap zaten ödünç verilmiş mi?
                 var kitapOduncDurumu = await _context.OduncKitaplar
                     .AnyAsync(o => o.KitapId == oduncKitap.KitapId && !o.TeslimDurumu);
 

@@ -14,8 +14,14 @@ namespace Kutuphane.Data
         public DbSet<Kitap> Kitaplar { get; set; }
         public DbSet<OduncKitap> OduncKitaplar { get; set; }
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Ogrenci>()
+                .HasIndex(o => o.OkulNumarasi)
+                .IsUnique(); // Burada benzersizlik sağlanıyor
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
