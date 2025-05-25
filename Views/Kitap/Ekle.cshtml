@@ -1,0 +1,141 @@
+@model Kutuphane.Models.Kitap
+
+@{
+    ViewData["Title"] = "Yeni Kitap Ekle";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+
+<style>
+    body {
+        background-color: #f4f6f8;
+        font-family: 'Inter', sans-serif;
+        color: #2c3e50;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 25px;
+    }
+
+    label {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    .form-control {
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        padding: 10px 12px;
+        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    .form-control:focus {
+        border-color: #5e72e4;
+        box-shadow: 0 0 0 0.15rem rgba(94, 114, 228, 0.25);
+        outline: none;
+    }
+
+    .text-danger {
+        font-size: 0.875rem;
+        color: #e74c3c !important;
+    }
+
+    .btn-primary {
+        background-color: #5e72e4;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #fff;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #324cdd;
+    }
+
+    .btn-secondary {
+        background-color: #adb5bd;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-left: 10px;
+    }
+
+    .btn-secondary:hover {
+        background-color: #889096;
+    }
+
+    .form-container {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        max-width: 650px;
+        margin: 0 auto;
+    }
+
+    select option {
+        background-color: #fff;
+        color: #2c3e50;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+</style>
+
+<h1>📘 Yeni Kitap Ekle</h1>
+
+<div class="form-container">
+    <form asp-action="Ekle">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="KitapAdi"></label>
+            <input asp-for="KitapAdi" class="form-control" />
+            <span asp-validation-for="KitapAdi" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Yazar"></label>
+            <input asp-for="Yazar" class="form-control" />
+            <span asp-validation-for="Yazar" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Yayinevi"></label>
+            <input asp-for="Yayinevi" class="form-control" />
+            <span asp-validation-for="Yayinevi" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ISBN"></label>
+            <input asp-for="ISBN" class="form-control" />
+            <span asp-validation-for="ISBN" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="KategoriId"></label>
+            <select asp-for="KategoriId" class="form-control" asp-items="ViewBag.Kategoriler">
+                <option value="">-- Kategori Seçin --</option>
+            </select>
+            <span asp-validation-for="KategoriId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mt-3">
+            <input type="submit" value="➕ Ekle" class="btn btn-primary" />
+            <a asp-action="Index" class="btn btn-secondary">⬅️ Listeye Dön</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,250 @@
+@model Kutuphane.Models.OduncKitap
+
+@{
+    ViewData["Title"] = "Kitap Ödünç Ver";
+}
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+        color: #212529;
+        padding: 20px;
+        cursor: default;
+    }
+
+    h1 {
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: 600;
+        color: #495057;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 1rem;
+        color: #495057;
+        box-sizing: border-box;
+        transition: border-color 0.15s ease-in-out;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
+    }
+
+    .list-group-item {
+        padding: 10px 15px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        margin-bottom: 6px;
+        cursor: pointer;
+        color: #212529;
+        background-color: #fff;
+        transition: background-color 0.2s;
+    }
+
+    .list-group-item:hover {
+        background-color: #e9ecef;
+    }
+
+    .list-group-item.disabled {
+        color: #6c757d;
+        cursor: not-allowed;
+        background-color: #f8f9fa;
+    }
+
+    .alert-success {
+        background-color: #d1e7dd;
+        border-color: #badbcc;
+        color: #0f5132;
+        padding: 10px 15px;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-weight: 600;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        background-color: #0b5ed7;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+        margin-left: 10px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+</style>
+
+<h1>Kitap Ödünç Ver</h1>
+<hr />
+
+<div style="max-width: 600px;">
+    <form id="oduncForm">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <!-- Kitap Arama -->
+        <div class="mb-3">
+            <label for="kitapArama">Kitap Ara</label>
+            <input type="text" id="kitapArama" class="form-control" placeholder="Kitap adı yazın..." autocomplete="off" />
+            <div id="kitapSonuclari" style="display:none; margin-top:6px;"></div>
+            <div id="seciliKitap" class="alert-success" style="display:none;">
+                <strong>Seçili Kitap:</strong> <span id="seciliKitapAdi"></span>
+                <input type="hidden" asp-for="KitapId" id="kitapId" />
+            </div>
+        </div>
+
+        <!-- Öğrenci Arama -->
+        <div class="mb-3">
+            <label for="ogrenciArama">Öğrenci Ara</label>
+            <input type="text" id="ogrenciArama" class="form-control" placeholder="Öğrenci adı yazın..." autocomplete="off" />
+            <div id="ogrenciSonuclari" style="display:none; margin-top:6px;"></div>
+            <div id="seciliOgrenci" class="alert-success" style="display:none;">
+                <strong>Seçili Öğrenci:</strong> <span id="seciliOgrenciAdi"></span>
+                <input type="hidden" asp-for="OgrenciId" id="ogrenciId" />
+            </div>
+        </div>
+
+        <div>
+            <button type="button" class="btn-primary" id="tamamlaBtn" disabled>Tamamla</button>
+            <a asp-action="Index" class="btn-secondary">Listeye Dön</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function () {
+            $('#kitapArama').on('input', function () {
+                var arama = $(this).val();
+                if (arama.length >= 2) {
+                    $.get('/Odunc/KitapAra', { arama: arama }, function (kitaplar) {
+                        var sonuclar = $('#kitapSonuclari');
+                        sonuclar.empty().show();
+                        kitaplar.forEach(function (kitap) {
+                            var disabled = kitap.oduncDurumu ? 'disabled' : '';
+                            sonuclar.append(`
+                                <div class="list-group-item ${disabled}" data-id="${kitap.id}" data-ad="${kitap.kitapAdi}">
+                                    ${kitap.kitapAdi} ${kitap.oduncDurumu ? '(Ödünç Verildi)' : ''}
+                                </div>
+                            `);
+                        });
+                    });
+                } else {
+                    $('#kitapSonuclari').hide();
+                }
+            });
+
+            $('#ogrenciArama').on('input', function () {
+                var arama = $(this).val();
+                if (arama.length >= 2) {
+                    $.get('/Odunc/OgrenciAra', { arama: arama }, function (ogrenciler) {
+                        var sonuclar = $('#ogrenciSonuclari');
+                        sonuclar.empty().show();
+                        ogrenciler.forEach(function (ogrenci) {
+                            sonuclar.append(`
+                                <div class="list-group-item" data-id="${ogrenci.id}" data-ad="${ogrenci.adSoyad}">
+                                    ${ogrenci.adSoyad}
+                                </div>
+                            `);
+                        });
+                    });
+                } else {
+                    $('#ogrenciSonuclari').hide();
+                }
+            });
+
+            $('#kitapSonuclari').on('click', '.list-group-item:not(.disabled)', function () {
+                var id = $(this).data('id');
+                var ad = $(this).data('ad');
+                $('#kitapId').val(id);
+                $('#seciliKitapAdi').text(ad);
+                $('#seciliKitap').show();
+                $('#kitapSonuclari').hide();
+                $('#kitapArama').val('');
+                kontrolEt();
+            });
+
+            $('#ogrenciSonuclari').on('click', '.list-group-item', function () {
+                var id = $(this).data('id');
+                var ad = $(this).data('ad');
+                $('#ogrenciId').val(id);
+                $('#seciliOgrenciAdi').text(ad);
+                $('#seciliOgrenci').show();
+                $('#ogrenciSonuclari').hide();
+                $('#ogrenciArama').val('');
+                kontrolEt();
+            });
+
+            function kontrolEt() {
+                const kitapSecildi = $('#kitapId').val() !== '';
+                const ogrenciSecildi = $('#ogrenciId').val() !== '';
+                $('#tamamlaBtn').prop('disabled', !(kitapSecildi && ogrenciSecildi));
+            }
+
+            $('#tamamlaBtn').click(function () {
+                const formData = {
+                    KitapId: $('#kitapId').val(),
+                    OgrenciId: $('#ogrenciId').val()
+                };
+                $.ajax({
+                    url: '/Odunc/Ver',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Kitap başarıyla ödünç verildi.');
+                            window.location.href = '/Odunc';
+                        } else {
+                            alert('Bir hata oluştu: ' + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                    }
+                });
+            });
+        });
+    </script>
+}

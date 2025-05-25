@@ -1,0 +1,176 @@
+@model IEnumerable<Kutuphane.Models.Kitap>
+
+@{
+    ViewData["Title"] = "Kitaplar";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+
+<style>
+    body {
+        background-color: #121212;
+        color: #f0f0f0;
+        font-family: 'Inter', sans-serif;
+        padding: 40px;
+    }
+
+    h1 {
+        color: #ff66b3;
+        font-weight: 600;
+        margin-bottom: 30px;
+        text-shadow: 0 0 10px #ff66b3aa;
+    }
+
+    table {
+        width: 100%;
+        background-color: #1f1b2e;
+        border-collapse: collapse;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(255, 102, 179, 0.2);
+    }
+
+    th, td {
+        padding: 12px 16px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #2c1a3c;
+        color: #ffaad1;
+        font-weight: 600;
+        font-size: 0.95rem;
+        user-select: none;
+    }
+
+    td {
+        font-size: 0.9rem;
+        border-top: 1px solid #3a2a4f;
+        color: #f0e5f5;
+    }
+
+    td em {
+        color: #cda4c7;
+        font-style: italic;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-warning {
+        background-color: #ff66b3;
+        color: #1f1b2e;
+        box-shadow: 0 0 10px #ff66b3aa;
+    }
+
+    .btn-warning:hover {
+        background-color: #e64a9b;
+        color: #fff;
+    }
+
+    .btn-danger {
+        background-color: #ff4d94;
+        color: white;
+        box-shadow: 0 0 10px #ff4d94bb;
+    }
+
+    .btn-danger:hover {
+        background-color: #d7005f;
+    }
+
+    .btn-primary {
+        background-color: #ff3399;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 700;
+        margin-top: 30px;
+        box-shadow: 0 0 15px #ff3399aa;
+    }
+
+    .btn-primary:hover {
+        background-color: #cc287a;
+    }
+
+    .badge {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .badge.bg-success {
+        background-color: #7bed9f;
+        color: #1f1b2e;
+        box-shadow: 0 0 6px #7bed9faa;
+    }
+
+    .badge.bg-danger {
+        background-color: #ff6b81;
+        color: #1f1b2e;
+        box-shadow: 0 0 6px #ff6b81aa;
+    }
+
+    a.btn-sm {
+        margin: 2px;
+    }
+</style>
+
+<h1>📚 Kitaplar</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.KitapAdi)</th>
+            <th>@Html.DisplayNameFor(model => model.Yazar)</th>
+            <th>@Html.DisplayNameFor(model => model.Yayinevi)</th>
+            <th>@Html.DisplayNameFor(model => model.ISBN)</th>
+            <th>@Html.DisplayNameFor(model => model.Kategori)</th>
+            <th>@Html.DisplayNameFor(model => model.OduncVerildiMi)</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.KitapAdi</td>
+                <td>@item.Yazar</td>
+                <td>@item.Yayinevi</td>
+                <td>@item.ISBN</td>
+                <td>
+                    @if (item.Kategori != null)
+                    {
+                        @item.Kategori.KategoriAdi
+                    }
+                    else
+                    {
+                        <em>📂 Yok</em>
+                    }
+                </td>
+                <td>
+                    @if (item.OduncVerildiMi)
+                    {
+                        <span class="badge bg-danger">Ödünç Verildi</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Mevcut</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Guncelle" asp-route-id="@item.Id" class="btn btn-warning btn-sm">✏️ Güncelle</a>
+                    <a asp-action="Sil" asp-route-id="@item.Id" class="btn btn-danger btn-sm">🗑️ Sil</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Ekle" class="btn btn-primary">➕ Yeni Kitap Ekle</a>
