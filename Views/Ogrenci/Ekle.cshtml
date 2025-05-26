@@ -1,191 +1,64 @@
-@model List<Ogrenci>
+@model Kutuphane.Models.Ogrenci
 
 @{
-    ViewData["Title"] = "Öğrenci Listesi";
+    ViewData["Title"] = "Yeni Öğrenci Ekle";
 }
 
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-user-plus me-2"></i>Yeni Öğrenci Ekle</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Ekle" method="post" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-<style>
-    body {
-        font-family: 'Poppins', sans-serif;
-        background: #f9fafb;
-        color: #333;
-        margin: 40px;
-        cursor: none;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
-    }
+                        <div class="form-group mb-3">
+                            <label asp-for="OgrenciAdi" class="form-label">Öğrenci Adı</label>
+                            <input asp-for="OgrenciAdi" class="form-control" />
+                            <span asp-validation-for="OgrenciAdi" class="text-danger"></span>
+                        </div>
 
-    h1 {
-        color: #2563eb;
-        font-weight: 700;
-        text-align: center;
-        margin-bottom: 40px;
-        letter-spacing: 0.03em;
-        user-select: none;
-        text-shadow: 0 0 8px #93c5fd66;
-    }
+                        <div class="form-group mb-3">
+                            <label asp-for="OgrenciSoyadi" class="form-label">Öğrenci Soyadı</label>
+                            <input asp-for="OgrenciSoyadi" class="form-control" />
+                            <span asp-validation-for="OgrenciSoyadi" class="text-danger"></span>
+                        </div>
 
-    table {
-        width: 100%;
-        max-width: 900px;
-        border-collapse: separate;
-        border-spacing: 0 12px;
-        background: #ffffff;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 8px 30px rgba(37, 99, 235, 0.15);
-    }
+                        <div class="form-group mb-3">
+                            <label asp-for="OkulNumarasi" class="form-label">Okul Numarası</label>
+                            <input asp-for="OkulNumarasi" class="form-control" />
+                            <span asp-validation-for="OkulNumarasi" class="text-danger"></span>
+                        </div>
 
-    thead tr {
-        background: #2563eb;
-        color: #fff;
-        font-weight: 600;
-        font-size: 1rem;
-        text-align: left;
-        box-shadow: 0 3px 10px rgba(37, 99, 235, 0.5);
-    }
+                        <div class="form-group mb-4">
+                            <label asp-for="SinifId" class="form-label">Sınıf</label>
+                            <select asp-for="SinifId" asp-items="@(ViewBag.Siniflar)" class="form-select">
+                                <option value="">Sınıf Seçiniz</option>
+                            </select>
+                            <span asp-validation-for="SinifId" class="text-danger"></span>
+                        </div>
 
-    thead th {
-        padding: 14px 20px;
-        user-select: none;
-    }
-
-    tbody tr {
-        background: #fefefe;
-        transition: background 0.3s ease, box-shadow 0.3s ease;
-        cursor: pointer;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    tbody tr:hover {
-        background: #e0e7ff;
-        box-shadow: 0 6px 18px rgba(37, 99, 235, 0.25);
-    }
-
-    tbody td {
-        padding: 14px 20px;
-        vertical-align: middle;
-        color: #1e293b;
-    }
-
-    /* Butonlar */
-    a.btn {
-        font-weight: 600;
-        padding: 6px 14px;
-        border-radius: 12px;
-        transition: background 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-        user-select: none;
-        font-size: 0.9rem;
-    }
-
-    a.btn-warning {
-        background: #facc15;
-        color: #1e293b;
-        box-shadow: 0 4px 12px rgba(250, 204, 21, 0.5);
-    }
-
-    a.btn-warning:hover {
-        background: #eab308;
-        color: white;
-        box-shadow: 0 8px 25px rgba(234, 179, 8, 0.8);
-    }
-
-    a.btn-danger {
-        background: #ef4444;
-        color: white;
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
-    }
-
-    a.btn-danger:hover {
-        background: #b91c1c;
-        box-shadow: 0 8px 25px rgba(185, 28, 28, 0.8);
-    }
-
-    a.btn-primary {
-        background: linear-gradient(45deg, #2563eb, #1e40af);
-        color: white;
-        font-weight: 700;
-        padding: 14px 30px;
-        border-radius: 40px;
-        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.7);
-        margin: 30px auto 0;
-        display: inline-block;
-        user-select: none;
-        font-size: 1.1rem;
-        transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-    }
-
-    a.btn-primary:hover {
-        background: linear-gradient(45deg, #1e40af, #2563eb);
-        box-shadow: 0 10px 35px rgba(37, 99, 235, 0.9);
-        transform: translateY(-3px);
-    }
-
-    /* Özel Cursor */
-    .custom-cursor {
-        position: fixed;
-        top: 0; left: 0;
-        width: 30px;
-        height: 30px;
-        border: 2.5px solid #2563eb;
-        border-radius: 50%;
-        pointer-events: none;
-        transition: transform 0.15s ease, background-color 0.3s ease;
-        transform: translate(-50%, -50%);
-        mix-blend-mode: difference;
-        z-index: 9999;
-        background: transparent;
-    }
-
-    .custom-cursor.hover {
-        transform: translate(-50%, -50%) scale(1.5);
-        background-color: #2563eb;
-        border-color: white;
-    }
-</style>
-
-<h1>@ViewData["Title"]</h1>
-
-<table>
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Adı</th>
-            <th>Soyadı</th>
-            <th>Okul Numarası</th>
-            <th>Sınıf</th>
-            <th>İşlemler</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var ogrenci in Model)
-        {
-            <tr>
-                <td>@ogrenci.Id</td>
-                <td>@ogrenci.OgrenciAdi</td>
-                <td>@ogrenci.OgrenciSoyadi</td>
-                <td>@ogrenci.OkulNumarasi</td>
-                <td>@ogrenci.Sinif?.SinifAdi</td>
-                <td>
-                    <a href="/Ogrenci/Guncelle/@ogrenci.Id" class="btn btn-warning btn-sm">Güncelle</a>
-                    <a href="/Ogrenci/Sil/@ogrenci.Id" class="btn btn-danger btn-sm">Sil</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<div style="text-align:center;">
-    <a href="/Ogrenci/Ekle" class="btn btn-primary">Yeni Öğrenci Ekle</a>
+                        <div class="form-group d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Kaydet
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Listeye Dön
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
 
 <script>
     const cursor = document.createElement('div');

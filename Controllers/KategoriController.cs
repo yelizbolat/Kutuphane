@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using Kutuphane.Data;
 using Kutuphane.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Kutuphane.Controllers
 {
+    [Authorize]
     public class KategoriController : Controller
     {
         private readonly KutuphaneDbContext _context;
@@ -17,7 +19,10 @@ namespace Kutuphane.Controllers
         // GET: Kategori
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Kategoriler.ToListAsync());
+            var aktifKategoriler = await _context.Kategoriler.Where(k => k.Aktif).ToListAsync();
+            var pasifKategoriler = await _context.Kategoriler.Where(k => !k.Aktif).ToListAsync();
+            ViewBag.PasifKategoriler = pasifKategoriler;
+            return View(aktifKategoriler);
         }
 
         // GET: Kategori/Ekle
@@ -109,13 +114,28 @@ namespace Kutuphane.Controllers
 
         // POST: Kategori/Sil/5
         [HttpPost]
-        [ValidateAntiForgeryToken, ActionName("Sil")]
+        [ValidateAntiForgeryToken]
+        [ActionName("Sil")]
         public async Task<IActionResult> SilOnayla(int id)
         {
             var kategori = await _context.Kategoriler.FindAsync(id);
             if (kategori != null)
             {
-                _context.Kategoriler.Remove(kategori);
+                kategori.Aktif = false;
+                _context.Kategoriler.Update(kategori);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GeriAl(int id)
+        {
+            var kategori = await _context.Kategoriler.FindAsync(id);
+            if (kategori != null)
+            {
+                kategori.Aktif = true;
+                _context.Kategoriler.Update(kategori);
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));

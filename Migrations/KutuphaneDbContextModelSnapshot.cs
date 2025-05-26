@@ -26,6 +26,9 @@ namespace Kutuphane.Migrations
                     b.Property<string>("Aciklama")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("Aktif")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("KategoriAdi")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -39,6 +42,9 @@ namespace Kutuphane.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Aktif")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("EklenmeTarihi")
@@ -73,37 +79,27 @@ namespace Kutuphane.Migrations
                     b.ToTable("Kitaplar");
                 });
 
-            modelBuilder.Entity("Kutuphane.Models.KitapOduncIslemleri", b =>
+            modelBuilder.Entity("Kutuphane.Models.Kullanici", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("AlinmaTarihi")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("GercekTeslimTarihi")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("KitapAdi")
+                    b.Property<string>("KullaniciAdi")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("OduncKitapId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("OgrenciAdi")
+                    b.Property<string>("Rol")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("TeslimTarihi")
+                    b.Property<string>("Sifre")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OduncKitapId");
-
-                    b.ToTable("kitapOduncİslemleris");
+                    b.ToTable("Kullanicilar");
                 });
 
             modelBuilder.Entity("Kutuphane.Models.OduncKitap", b =>
@@ -142,6 +138,9 @@ namespace Kutuphane.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("Aktif")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("EklenmeTarihi")
                         .HasColumnType("TEXT");
 
@@ -173,6 +172,9 @@ namespace Kutuphane.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("Aktif")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("SinifAdi")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -190,17 +192,6 @@ namespace Kutuphane.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Kategori");
-                });
-
-            modelBuilder.Entity("Kutuphane.Models.KitapOduncIslemleri", b =>
-                {
-                    b.HasOne("Kutuphane.Models.OduncKitap", "OduncKitap")
-                        .WithMany()
-                        .HasForeignKey("OduncKitapId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("OduncKitap");
                 });
 
             modelBuilder.Entity("Kutuphane.Models.OduncKitap", b =>

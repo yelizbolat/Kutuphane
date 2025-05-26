@@ -2,124 +2,6 @@
     ViewData["Title"] = "Kitap Ara";
 }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: #121212;
-        color: #e0e0e0;
-        padding: 40px;
-        cursor: none;
-    }
-
-    h2 {
-        color: #00bcd4;
-        margin-bottom: 24px;
-        font-weight: 600;
-        font-size: 1.8rem;
-        text-align: center;
-        text-shadow: 0 0 6px #00bcd4aa;
-    }
-
-    .form-group {
-        max-width: 400px;
-        margin: 0 auto 32px auto;
-    }
-
-    label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: #b0bec5;
-        font-size: 1rem;
-    }
-
-    input#arama {
-        width: 100%;
-        padding: 12px 16px;
-        font-size: 1rem;
-        border-radius: 10px;
-        border: 2px solid #007c91;
-        background-color: #1e1e1e;
-        color: #e0e0e0;
-        outline: none;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    input#arama:focus {
-        border-color: #00bcd4;
-        box-shadow: 0 0 8px #00bcd4bb;
-    }
-
-    table {
-        width: 100%;
-        max-width: 600px;
-        margin: 0 auto;
-        border-collapse: collapse;
-        background-color: #1f2937;
-        border-radius: 12px;
-        box-shadow: 0 0 15px rgba(0, 188, 212, 0.2);
-        overflow: hidden;
-    }
-
-    thead {
-        background-color: #00bcd4;
-        color: #121212;
-        font-weight: 700;
-        font-size: 1rem;
-    }
-
-    th, td {
-        padding: 14px 20px;
-        text-align: center;
-        border-bottom: 1px solid #2c3e50;
-        font-weight: 500;
-    }
-
-    tbody tr:hover {
-        background-color: #273c48;
-        transition: background-color 0.25s ease;
-    }
-
-    tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    .text-success {
-        color: #4caf50;
-        font-weight: 600;
-    }
-
-    .text-danger {
-        color: #f44336;
-        font-weight: 600;
-    }
-
-    /* Minimalist custom cursor */
-    .custom-cursor {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 20px;
-        height: 20px;
-        border: 2px solid #00bcd4;
-        border-radius: 50%;
-        pointer-events: none;
-        transform: translate(-50%, -50%);
-        z-index: 9999;
-        mix-blend-mode: difference;
-        transition: transform 0.1s ease, background-color 0.3s ease;
-        background-color: transparent;
-    }
-
-    .custom-cursor.hover {
-        transform: translate(-50%, -50%) scale(1.4);
-        background-color: #00bcd4;
-        border-color: #ffffffdd;
-    }
-</style>
-
 <h2>🔍 Kitap Arama</h2>
 
 <div class="form-group">
@@ -153,7 +35,7 @@
                 }
 
                 $.ajax({
-                    url: '@Url.Action("KitapAra", "Kitap")',
+                    url: '@Url.Action("KitapAra", "Odunc")',
                     type: 'GET',
                     data: { arama: arama },
                     success: function (data) {

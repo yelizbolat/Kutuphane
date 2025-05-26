@@ -1,138 +1,84 @@
-@model Ogrenci
+@model Kutuphane.Models.Ogrenci
 
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+@{
+    ViewData["Title"] = "Öğrenci Sil";
+}
 
-<style>
-    body {
-        font-family: 'Poppins', sans-serif;
-        background-color: #f9fafb;
-        color: #333;
-        padding: 40px;
-        cursor: none;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
-        margin: 0;
-    }
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0"><i class="fas fa-user-minus me-2"></i>Öğrenci Sil</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Dikkat!</strong> Bu işlem geri alınamaz.
+                    </div>
 
-    h2 {
-        color: #2563eb;
-        font-weight: 700;
-        text-align: center;
-        margin-bottom: 25px;
-        letter-spacing: 0.05em;
-        user-select: none;
-        text-shadow: 0 0 6px #93c5fd88;
-    }
+                    <dl class="row">
+                        <dt class="col-sm-3">Ad Soyad</dt>
+                        <dd class="col-sm-9">@Model.OgrenciAdi @Model.OgrenciSoyadi</dd>
 
-    p {
-        font-size: 1.15rem;
-        text-align: center;
-        margin-bottom: 40px;
-        color: #4b5563;
-        max-width: 420px;
-        line-height: 1.5;
-    }
+                        <dt class="col-sm-3">Okul Numarası</dt>
+                        <dd class="col-sm-9">@Model.OkulNumarasi</dd>
 
-    form {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        flex-wrap: wrap;
-        max-width: 420px;
-        width: 100%;
-    }
+                        <dt class="col-sm-3">Sınıf</dt>
+                        <dd class="col-sm-9">@(Model.Sinif?.SinifAdi ?? "Belirtilmemiş")</dd>
+                    </dl>
 
-    button.btn-danger {
-        background-color: #ef4444;
-        border: none;
-        color: white;
-        padding: 12px 32px;
-        font-weight: 600;
-        border-radius: 30px;
-        box-shadow: 0 6px 18px rgba(239, 68, 68, 0.4);
-        transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-        cursor: pointer;
-        user-select: none;
-        flex: 1 1 150px;
-        text-align: center;
-    }
+                    @if (ViewBag.OduncKitaplar != null && ViewBag.OduncKitaplar.Count > 0)
+                    {
+                        <div class="alert alert-danger mt-3">
+                            <h5><i class="fas fa-exclamation-circle me-2"></i>Ödünç Alınmış Kitaplar</h5>
+                            <p>Bu öğrencinin teslim etmediği kitaplar var. Önce kitapları teslim almalısınız.</p>
+                            <ul class="list-group mt-2">
+                                @foreach (var kitap in ViewBag.OduncKitaplar)
+                                {
+                                    <li class="list-group-item list-group-item-danger">
+                                        <i class="fas fa-book me-2"></i>@kitap.Kitap.KitapAdi
+                                        <small class="text-muted ms-2">(Alınma: @kitap.OduncAlmaTarihi.ToString("dd.MM.yyyy"))</small>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
 
-    button.btn-danger:hover {
-        background-color: #b91c1c;
-        box-shadow: 0 10px 30px rgba(185, 28, 28, 0.6);
-        transform: translateY(-3px);
-    }
+                    <form asp-action="Sil" method="post" class="mt-4">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex gap-2">
+                            @if (ViewBag.OduncKitaplar == null || ViewBag.OduncKitaplar.Count == 0)
+                            {
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash-alt me-2"></i>Sil
+                                </button>
+                            }
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Listeye Dön
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    a.btn-secondary {
-        background-color: #e5e7eb;
-        color: #374151;
-        padding: 12px 32px;
-        font-weight: 600;
-        border-radius: 30px;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
-        transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-        user-select: none;
-        flex: 1 1 150px;
-        text-align: center;
-    }
+@section Scripts {
+    <script>
+        const cursor = document.createElement('div');
+        cursor.classList.add('custom-cursor');
+        document.body.appendChild(cursor);
 
-    a.btn-secondary:hover {
-        background-color: #d1d5db;
-        color: #111827;
-        transform: translateY(-3px);
-    }
+        document.addEventListener('mousemove', e => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
 
-    /* Özel cursor */
-    .custom-cursor {
-        position: fixed;
-        top: 0; left: 0;
-        width: 30px;
-        height: 30px;
-        border: 2.5px solid #2563eb;
-        border-radius: 50%;
-        pointer-events: none;
-        transition: transform 0.15s ease, background-color 0.3s ease;
-        transform: translate(-50%, -50%);
-        mix-blend-mode: difference;
-        z-index: 9999;
-        background: transparent;
-    }
-
-    .custom-cursor.hover {
-        transform: translate(-50%, -50%) scale(1.5);
-        background-color: #2563eb;
-        border-color: white;
-    }
-</style>
-
-<h2>Öğrenci Sil</h2>
-<p>@Model.OgrenciAdi @Model.OgrenciSoyadi adlı öğrenciyi silmek istediğinize emin misiniz?</p>
-
-<form asp-action="SilOnayla" method="post" asp-controller="Ogrenci">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Sil</button>
-    <a asp-action="Index" class="btn btn-secondary">İptal</a>
-</form>
-
-<script>
-    const cursor = document.createElement('div');
-    cursor.classList.add('custom-cursor');
-    document.body.appendChild(cursor);
-
-    document.addEventListener('mousemove', e => {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
-    });
-
-    document.querySelectorAll('button.btn-danger, a.btn-secondary').forEach(el => {
-        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-    });
-</script>
+        document.querySelectorAll('button, a.btn').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+    </script>
+}

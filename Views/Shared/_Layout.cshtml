@@ -1,11 +1,11 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Kutuphane</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - Kütüphane Yönetim Sistemi</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Kutuphane.styles.css" asp-append-version="true" />
 </head>
@@ -13,47 +13,115 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Kutuphane</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-book-reader me-2"></i>Kütüphane
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item"></li>
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Ogrenci" asp-action="Index">Ögrenci</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Sinif" asp-action="Index">Sınıf</a>
-                        </li>
-                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Kitap" asp-action="Index">Kitap</a>
-                        </li>
-                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Kategori" asp-action="Index">Kategori</a>
-                        </li>
-                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Odunc" asp-action="Index">Ödünç Kitap</a>
-                        </li>
-                    </ul>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
+                    <div class="navbar-nav">
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-2"></i>
+                                <span>@User.Identity?.Name</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="active">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-book-reader me-2"></i>Kütüphane</h3>
+                <button type="button" id="sidebarCollapse" class="btn btn-link">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <i class="fas fa-home me-2"></i>
+                        <span>Ana Sayfa</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Ogrenci" asp-action="Index">
+                        <i class="fas fa-user-graduate me-2"></i>
+                        <span>Öğrenci</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Sinif" asp-action="Index">
+                        <i class="fas fa-chalkboard me-2"></i>
+                        <span>Sınıf</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Kitap" asp-action="Index">
+                        <i class="fas fa-book me-2"></i>
+                        <span>Kitap</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Kategori" asp-action="Index">
+                        <i class="fas fa-tags me-2"></i>
+                        <span>Kategori</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Odunc" asp-action="Index">
+                        <i class="fas fa-hand-holding me-2"></i>
+                        <span>Ödünç Kitap</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Rapor" asp-action="Index">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        <span>Raporlar</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            <div class="container-fluid mt-4">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
+
+            <footer class="footer mt-auto py-3">
+                <div class="container text-center">
+                    <span class="text-muted">&copy; @DateTime.Now.Year - Kütüphane Yönetim Sistemi | Yeliz Bolat - 601</span>
+                </div>
+            </footer>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Kutuphane - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+            });
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

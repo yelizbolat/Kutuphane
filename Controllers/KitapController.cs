@@ -3,9 +3,11 @@ using Kutuphane.Data;
 using Kutuphane.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Kutuphane.Controllers
 {
+    [Authorize]
     public class KitapController : Controller
     {
         private readonly KutuphaneDbContext _context;
@@ -18,10 +20,10 @@ namespace Kutuphane.Controllers
         // GET: Kitap
         public async Task<IActionResult> Index()
         {
-            var kitaplar = await _context.Kitaplar
-                                 .Include(k => k.Kategori) // Kategori'yi Include et
-                                 .ToListAsync();
-            return View(kitaplar);
+            var aktifKitaplar = await _context.Kitaplar.Include(k => k.Kategori).Where(k => k.Aktif).ToListAsync();
+            var pasifKitaplar = await _context.Kitaplar.Include(k => k.Kategori).Where(k => !k.Aktif).ToListAsync();
+            ViewBag.PasifKitaplar = pasifKitaplar;
+            return View(aktifKitaplar);
         }
 
         // GET: Kitap/Ekle
@@ -125,7 +127,21 @@ namespace Kutuphane.Controllers
             var kitap = await _context.Kitaplar.FindAsync(id);
             if (kitap != null)
             {
-                _context.Kitaplar.Remove(kitap);
+                kitap.Aktif = false;
+                _context.Kitaplar.Update(kitap);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GeriAl(int id)
+        {
+            var kitap = await _context.Kitaplar.FindAsync(id);
+            if (kitap != null)
+            {
+                kitap.Aktif = true;
+                _context.Kitaplar.Update(kitap);
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));

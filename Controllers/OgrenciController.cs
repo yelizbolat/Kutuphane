@@ -3,10 +3,11 @@ using Kutuphane.Data; // Adjust namespace based on your project structure
 using Kutuphane.Models; // Adjust namespace based on your models
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
+using Microsoft.AspNetCore.Authorization;
 
 namespace Kutuphane.Controllers
 {
+    [Authorize]
     public class OgrenciController : Controller
     {
         private readonly KutuphaneDbContext _context;
@@ -38,7 +39,7 @@ namespace Kutuphane.Controllers
              if (ModelState.IsValid)
             {
                 _context.Ogrenciler.Add(ogrenci);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
            ViewBag.Siniflar = new SelectList(await _context.Siniflar.ToListAsync(), "Id", "SinifAdi");
@@ -76,10 +77,20 @@ namespace Kutuphane.Controllers
         [HttpGet]
         public async Task<IActionResult> Sil(int id)
         {
-            var ogrenci = await _context.Ogrenciler.FindAsync(id);
+            var ogrenci = await _context.Ogrenciler
+                .Include(o => o.Sinif)
+                .FirstOrDefaultAsync(o => o.Id == id);
+                
             if (ogrenci == null) return NotFound();
 
-            return View(ogrenci); // Silmeden önce kullanıcıya doğrulama için nesneyi gösterir
+            // Öğrencinin ödünç aldığı kitapları kontrol et
+            var oduncKitaplar = await _context.OduncKitaplar
+                .Where(o => o.OgrenciId == id && !o.TeslimDurumu)
+                .Include(o => o.Kitap)
+                .ToListAsync();
+
+            ViewBag.OduncKitaplar = oduncKitaplar;
+            return View(ogrenci);
         }
 
         [HttpPost, ActionName("Sil")]
@@ -89,9 +100,20 @@ namespace Kutuphane.Controllers
             var ogrenci = await _context.Ogrenciler.FindAsync(id);
             if (ogrenci == null) return NotFound();
 
-            _context.Ogrenciler.Remove(ogrenci); // Nesneyi sil
+            // Öğrencinin ödünç aldığı kitapları kontrol et
+            var oduncKitaplar = await _context.OduncKitaplar
+                .Where(o => o.OgrenciId == id && !o.TeslimDurumu)
+                .ToListAsync();
+
+            if (oduncKitaplar.Any())
+            {
+                TempData["Hata"] = "Bu öğrencinin teslim etmediği kitaplar var. Önce kitapları teslim alın.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _context.Ogrenciler.Remove(ogrenci);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Index"); // Ana listeye yönlendir
+            return RedirectToAction(nameof(Index));
         }
     }   
 }

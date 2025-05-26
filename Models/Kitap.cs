@@ -23,5 +23,7 @@ namespace Kutuphane.Models
 
         public bool OduncVerildiMi { get; set; } = false;
         public DateTime EklenmeTarihi { get; set; } = DateTime.Now;
+
+        public bool Aktif { get; set; } = true;
     }
 } 

@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\bolat\\OneDrive\\Masaüstü\\mvc\\Kutuphane\\Kutuphane.csproj": {}
+    "C:\\Users\\yeliz601\\Desktop\\MVC\\Kutuphane\\Kutuphane.csproj": {}
   },
   "projects": {
-    "C:\\Users\\bolat\\OneDrive\\Masaüstü\\mvc\\Kutuphane\\Kutuphane.csproj": {
+    "C:\\Users\\yeliz601\\Desktop\\MVC\\Kutuphane\\Kutuphane.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\bolat\\OneDrive\\Masaüstü\\mvc\\Kutuphane\\Kutuphane.csproj",
+        "projectUniqueName": "C:\\Users\\yeliz601\\Desktop\\MVC\\Kutuphane\\Kutuphane.csproj",
         "projectName": "Kutuphane",
-        "projectPath": "C:\\Users\\bolat\\OneDrive\\Masaüstü\\mvc\\Kutuphane\\Kutuphane.csproj",
-        "packagesPath": "C:\\Users\\bolat\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\bolat\\OneDrive\\Masaüstü\\mvc\\Kutuphane\\obj\\",
+        "projectPath": "C:\\Users\\yeliz601\\Desktop\\MVC\\Kutuphane\\Kutuphane.csproj",
+        "packagesPath": "C:\\Users\\yeliz601\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\yeliz601\\Desktop\\MVC\\Kutuphane\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\bolat\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\yeliz601\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -84,7 +90,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.204/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
