@@ -80,16 +80,20 @@ namespace Kutuphane.Controllers
             var ogrenci = await _context.Ogrenciler
                 .Include(o => o.Sinif)
                 .FirstOrDefaultAsync(o => o.Id == id);
-                
-            if (ogrenci == null) return NotFound();
+
+            if (ogrenci == null)
+            {
+                return NotFound();
+            }
 
             // Öğrencinin ödünç aldığı kitapları kontrol et
             var oduncKitaplar = await _context.OduncKitaplar
-                .Where(o => o.OgrenciId == id && !o.TeslimDurumu)
                 .Include(o => o.Kitap)
+                .Where(o => o.OgrenciId == id && o.TeslimTarihi == null)
                 .ToListAsync();
 
             ViewBag.OduncKitaplar = oduncKitaplar;
+
             return View(ogrenci);
         }
 
@@ -98,17 +102,20 @@ namespace Kutuphane.Controllers
         public async Task<IActionResult> SilOnayla(int id)
         {
             var ogrenci = await _context.Ogrenciler.FindAsync(id);
-            if (ogrenci == null) return NotFound();
+            if (ogrenci == null)
+            {
+                return NotFound();
+            }
 
             // Öğrencinin ödünç aldığı kitapları kontrol et
             var oduncKitaplar = await _context.OduncKitaplar
-                .Where(o => o.OgrenciId == id && !o.TeslimDurumu)
+                .Where(o => o.OgrenciId == id && o.TeslimTarihi == null)
                 .ToListAsync();
 
             if (oduncKitaplar.Any())
             {
-                TempData["Hata"] = "Bu öğrencinin teslim etmediği kitaplar var. Önce kitapları teslim alın.";
-                return RedirectToAction(nameof(Index));
+                TempData["Hata"] = "Bu öğrencinin teslim etmediği kitaplar var. Önce kitapları teslim almalısınız.";
+                return RedirectToAction(nameof(Sil), new { id });
             }
 
             _context.Ogrenciler.Remove(ogrenci);

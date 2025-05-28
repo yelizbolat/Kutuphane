@@ -1,56 +1,105 @@
 @model Kutuphane.Models.OduncKitap
 
 @{
-    ViewData["Title"] = "Teslim Al";
+    ViewData["Title"] = "Kitap Teslim Al";
 }
 
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-check-circle me-2"></i>@ViewData["Title"]
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Bilgi:</strong> Kitabı teslim almak üzeresiniz.
+                    </div>
 
-<div class="container">
-    <h2>📘 Kitap Teslim Onayı</h2>
+                    <div class="mb-4">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary mb-3">
+                                            <i class="fas fa-book me-2"></i>Kitap Bilgileri
+                                        </h5>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar-circle bg-info text-white me-3">
+                                                <i class="fas fa-book"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">@Model.Kitap.KitapAdi</h6>
+                                                <small class="text-muted">@Model.Kitap.Yazar</small>
+                                            </div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Alınma Tarihi:</strong>
+                                            <span class="ms-2">@Model.OduncAlmaTarihi.ToString("dd.MM.yyyy")</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary mb-3">
+                                            <i class="fas fa-user me-2"></i>Öğrenci Bilgileri
+                                        </h5>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar-circle bg-primary text-white me-3">
+                                                @Model.Ogrenci.OgrenciAdi[0]@Model.Ogrenci.OgrenciSoyadi[0]
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">@Model.Ogrenci.OgrenciAdi @Model.Ogrenci.OgrenciSoyadi</h6>
+                                                <small class="text-muted">@Model.Ogrenci.OkulNumarasi</small>
+                                            </div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>Sınıf:</strong>
+                                            <span class="badge bg-info ms-2">@Model.Ogrenci.Sinif?.SinifAdi</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-    <h4>📄 Ödünç Kitap Bilgileri</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-3">Kitap Adı</dt>
-        <dd class="col-sm-9">@Model.Kitap?.KitapAdi</dd>
-
-        <dt class="col-sm-3">Öğrenci</dt>
-        <dd class="col-sm-9">@Model.Ogrenci?.OgrenciAdi @Model.Ogrenci?.OgrenciSoyadi</dd>
-
-        <dt class="col-sm-3">Ödünç Alınma Tarihi</dt>
-        <dd class="col-sm-9">@Model.OduncAlmaTarihi.ToString("dd.MM.yyyy")</dd>
-
-        <dt class="col-sm-3">Teslim Tarihi</dt>
-        <dd class="col-sm-9">
-            @(Model.TeslimTarihi.HasValue ? Model.TeslimTarihi.Value.ToString("dd.MM.yyyy HH:mm") : "Henüz teslim edilmedi")
-        </dd>
-
-        <dt class="col-sm-3">Teslim Durumu</dt>
-        <dd class="col-sm-9">
-            @if (Model.TeslimDurumu)
-            {
-                <span class="text-success">Teslim Edildi</span>
-            }
-            else
-            {
-                <span class="text-danger">Teslim Edilmedi</span>
-            }
-        </dd>
-    </dl>
-
-    <form asp-action="TeslimAl" method="post" style="text-align:center;">
-        <input type="hidden" asp-for="Id" />
-        <div class="form-group">
-            <p>Bu kitabı <strong>teslim almak</strong> istiyor musunuz?</p>
-            <button type="submit" class="btn btn-success">✅ Evet, Teslim Al</button>
-            <a asp-action="Index" class="btn btn-secondary">❌ İptal</a>
+                    <form asp-action="TeslimAl" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check me-2"></i>Teslim Al
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>İptal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    </form>
+    </div>
 </div>
+
+<style>
+    .avatar-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        font-weight: 500;
+    }
+</style>
 
 @section Scripts {
     <script>
-        // Custom Cursor
         const cursor = document.createElement('div');
         cursor.classList.add('custom-cursor');
         document.body.appendChild(cursor);
@@ -60,7 +109,7 @@
             cursor.style.top = e.clientY + 'px';
         });
 
-        document.querySelectorAll('button, a').forEach(el => {
+        document.querySelectorAll('button, a.btn').forEach(el => {
             el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
             el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
         });

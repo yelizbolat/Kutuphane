@@ -1,27 +1,51 @@
-@model Sinif
+@model Kutuphane.Models.Sinif
 
 @{
     ViewData["Title"] = "Sınıf Güncelle";
 }
 
-<div>
-    <h2>@ViewData["Title"]</h2>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>@ViewData["Title"]
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Guncelle" method="post" novalidate>
+                        <input type="hidden" asp-for="Id" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-    <form asp-action="Guncelle" method="post" novalidate>
-        <div class="form-group">
-            <label asp-for="SinifAdi"></label>
-            <input asp-for="SinifAdi" />
-            <span asp-validation-for="SinifAdi" class="text-danger"></span>
+                        <div class="form-group mb-4">
+                            <label asp-for="SinifAdi" class="form-label">Sınıf Adı</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-chalkboard"></i>
+                                </span>
+                                <input asp-for="SinifAdi" class="form-control" placeholder="Sınıf adını giriniz" />
+                            </div>
+                            <span asp-validation-for="SinifAdi" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Güncelle
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Listeye Dön
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <input type="hidden" asp-for="Id" />
-        <button type="submit" class="btn btn-primary">Güncelle</button>
-    </form>
-
-    <a asp-action="Index" class="btn btn-secondary">Geri Dön</a>
+    </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
 
 <script>
@@ -34,7 +58,7 @@
         cursor.style.top = e.clientY + 'px';
     });
 
-    document.querySelectorAll('button, a').forEach(el => {
+    document.querySelectorAll('button, input').forEach(el => {
         el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
         el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
     });

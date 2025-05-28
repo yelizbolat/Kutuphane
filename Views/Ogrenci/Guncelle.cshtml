@@ -1,39 +1,66 @@
-@model Ogrenci
+@model Kutuphane.Models.Ogrenci
 
 @{
     ViewData["Title"] = "Öğrenci Güncelle";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-user-edit me-2"></i>@ViewData["Title"]
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Guncelle" method="post" novalidate>
+                        <input type="hidden" asp-for="Id" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-<form asp-action="Guncelle" method="post" novalidate>
-    <div class="form-group">
-        <label asp-for="OgrenciAdi"></label>
-        <input asp-for="OgrenciAdi" />
-        <span asp-validation-for="OgrenciAdi" class="text-danger"></span>
+                        <div class="form-group mb-3">
+                            <label asp-for="OgrenciAdi" class="form-label">Öğrenci Adı</label>
+                            <input asp-for="OgrenciAdi" class="form-control" />
+                            <span asp-validation-for="OgrenciAdi" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="OgrenciSoyadi" class="form-label">Öğrenci Soyadı</label>
+                            <input asp-for="OgrenciSoyadi" class="form-control" />
+                            <span asp-validation-for="OgrenciSoyadi" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="OkulNumarasi" class="form-label">Okul Numarası</label>
+                            <input asp-for="OkulNumarasi" class="form-control" />
+                            <span asp-validation-for="OkulNumarasi" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="SinifId" class="form-label">Sınıf</label>
+                            <select asp-for="SinifId" asp-items="@(ViewBag.Siniflar)" class="form-select">
+                                <option value="">Sınıf Seçiniz</option>
+                            </select>
+                            <span asp-validation-for="SinifId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Güncelle
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Listeye Dön
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="OgrenciSoyadi"></label>
-        <input asp-for="OgrenciSoyadi" />
-        <span asp-validation-for="OgrenciSoyadi" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="OkulNumarasi"></label>
-        <input asp-for="OkulNumarasi" />
-        <span asp-validation-for="OkulNumarasi" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="SinifId"></label>
-        <select asp-for="SinifId" asp-items="@(ViewBag.Siniflar)">
-            <option value="0">Bir Sınıf Seç</option>
-        </select>
-        <span asp-validation-for="SinifId" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Güncelle</button>
-</form>
+</div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
 
 <script>

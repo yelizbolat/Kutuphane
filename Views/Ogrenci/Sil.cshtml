@@ -4,58 +4,73 @@
     ViewData["Title"] = "Öğrenci Sil";
 }
 
-<div class="container">
+<div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
                 <div class="card-header bg-danger text-white">
-                    <h3 class="mb-0"><i class="fas fa-user-minus me-2"></i>Öğrenci Sil</h3>
+                    <h3 class="mb-0">
+                        <i class="fas fa-user-times me-2"></i>@ViewData["Title"]
+                    </h3>
                 </div>
                 <div class="card-body">
                     <div class="alert alert-warning">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        <strong>Dikkat!</strong> Bu işlem geri alınamaz.
+                        <strong>Dikkat!</strong> Bu öğrenciyi silmek istediğinizden emin misiniz?
                     </div>
 
-                    <dl class="row">
-                        <dt class="col-sm-3">Ad Soyad</dt>
-                        <dd class="col-sm-9">@Model.OgrenciAdi @Model.OgrenciSoyadi</dd>
-
-                        <dt class="col-sm-3">Okul Numarası</dt>
-                        <dd class="col-sm-9">@Model.OkulNumarasi</dd>
-
-                        <dt class="col-sm-3">Sınıf</dt>
-                        <dd class="col-sm-9">@(Model.Sinif?.SinifAdi ?? "Belirtilmemiş")</dd>
-                    </dl>
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar-circle bg-primary text-white me-3">
+                                @Model.OgrenciAdi[0]@Model.OgrenciSoyadi[0]
+                            </div>
+                            <div>
+                                <h5 class="mb-0">@Model.OgrenciAdi @Model.OgrenciSoyadi</h5>
+                                <small class="text-muted">@Model.OkulNumarasi</small>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Sınıf:</strong>
+                            <span class="badge bg-info">@Model.Sinif?.SinifAdi</span>
+                        </div>
+                    </div>
 
                     @if (ViewBag.OduncKitaplar != null && ViewBag.OduncKitaplar.Count > 0)
                     {
-                        <div class="alert alert-danger mt-3">
-                            <h5><i class="fas fa-exclamation-circle me-2"></i>Ödünç Alınmış Kitaplar</h5>
-                            <p>Bu öğrencinin teslim etmediği kitaplar var. Önce kitapları teslim almalısınız.</p>
-                            <ul class="list-group mt-2">
+                        <div class="alert alert-danger">
+                            <h5 class="alert-heading">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                Ödünç Alınmış Kitaplar
+                            </h5>
+                            <p class="mb-2">Bu öğrencinin teslim etmediği kitaplar var. Önce kitapları teslim almalısınız.</p>
+                            <div class="list-group mt-3">
                                 @foreach (var kitap in ViewBag.OduncKitaplar)
                                 {
-                                    <li class="list-group-item list-group-item-danger">
-                                        <i class="fas fa-book me-2"></i>@kitap.Kitap.KitapAdi
-                                        <small class="text-muted ms-2">(Alınma: @kitap.OduncAlmaTarihi.ToString("dd.MM.yyyy"))</small>
-                                    </li>
+                                    <div class="list-group-item list-group-item-danger d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="fas fa-book me-2"></i>
+                                            @kitap.Kitap.KitapAdi
+                                        </div>
+                                        <small class="text-muted">
+                                            Alınma: @kitap.OduncAlmaTarihi.ToString("dd.MM.yyyy")
+                                        </small>
+                                    </div>
                                 }
-                            </ul>
+                            </div>
                         </div>
                     }
 
-                    <form asp-action="Sil" method="post" class="mt-4">
+                    <form asp-action="Sil" method="post">
                         <input type="hidden" asp-for="Id" />
                         <div class="d-flex gap-2">
                             @if (ViewBag.OduncKitaplar == null || ViewBag.OduncKitaplar.Count == 0)
                             {
                                 <button type="submit" class="btn btn-danger">
-                                    <i class="fas fa-trash-alt me-2"></i>Sil
+                                    <i class="fas fa-trash me-2"></i>Sil
                                 </button>
                             }
                             <a asp-action="Index" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left me-2"></i>Listeye Dön
+                                <i class="fas fa-arrow-left me-2"></i>İptal
                             </a>
                         </div>
                     </form>
@@ -64,6 +79,19 @@
         </div>
     </div>
 </div>
+
+<style>
+    .avatar-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        font-weight: 500;
+    }
+</style>
 
 @section Scripts {
     <script>

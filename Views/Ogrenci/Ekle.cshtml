@@ -4,12 +4,14 @@
     ViewData["Title"] = "Yeni Öğrenci Ekle";
 }
 
-<div class="container">
+<div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow">
+            <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0"><i class="fas fa-user-plus me-2"></i>Yeni Öğrenci Ekle</h3>
+                    <h3 class="mb-0">
+                        <i class="fas fa-user-plus me-2"></i>@ViewData["Title"]
+                    </h3>
                 </div>
                 <div class="card-body">
                     <form asp-action="Ekle" method="post" novalidate>
@@ -17,27 +19,47 @@
 
                         <div class="form-group mb-3">
                             <label asp-for="OgrenciAdi" class="form-label">Öğrenci Adı</label>
-                            <input asp-for="OgrenciAdi" class="form-control" />
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input asp-for="OgrenciAdi" class="form-control" placeholder="Öğrencinin adını giriniz" />
+                            </div>
                             <span asp-validation-for="OgrenciAdi" class="text-danger"></span>
                         </div>
 
                         <div class="form-group mb-3">
                             <label asp-for="OgrenciSoyadi" class="form-label">Öğrenci Soyadı</label>
-                            <input asp-for="OgrenciSoyadi" class="form-control" />
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input asp-for="OgrenciSoyadi" class="form-control" placeholder="Öğrencinin soyadını giriniz" />
+                            </div>
                             <span asp-validation-for="OgrenciSoyadi" class="text-danger"></span>
                         </div>
 
                         <div class="form-group mb-3">
                             <label asp-for="OkulNumarasi" class="form-label">Okul Numarası</label>
-                            <input asp-for="OkulNumarasi" class="form-control" />
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-id-card"></i>
+                                </span>
+                                <input asp-for="OkulNumarasi" class="form-control" placeholder="Öğrencinin okul numarasını giriniz" />
+                            </div>
                             <span asp-validation-for="OkulNumarasi" class="text-danger"></span>
                         </div>
 
                         <div class="form-group mb-4">
                             <label asp-for="SinifId" class="form-label">Sınıf</label>
-                            <select asp-for="SinifId" asp-items="@(ViewBag.Siniflar)" class="form-select">
-                                <option value="">Sınıf Seçiniz</option>
-                            </select>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-chalkboard"></i>
+                                </span>
+                                <select asp-for="SinifId" asp-items="@(ViewBag.Siniflar)" class="form-select">
+                                    <option value="">Sınıf Seçiniz</option>
+                                </select>
+                            </div>
                             <span asp-validation-for="SinifId" class="text-danger"></span>
                         </div>
 
@@ -70,7 +92,7 @@
         cursor.style.top = e.clientY + 'px';
     });
 
-    document.querySelectorAll('a.btn').forEach(el => {
+    document.querySelectorAll('button, select, input').forEach(el => {
         el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
         el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
     });

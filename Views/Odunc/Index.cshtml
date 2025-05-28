@@ -1,67 +1,118 @@
-@model IEnumerable<Kutuphane.Models.OduncKitap>
+@model List<Kutuphane.Models.OduncKitap>
 
 @{
     ViewData["Title"] = "Ödünç Kitap Listesi";
 }
 
-<h1>📘 Ödünç Kitaplar</h1>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-book-reader me-2 text-primary"></i>@ViewData["Title"]
+        </h1>
+        <a href="/Odunc/Ver" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Yeni Ödünç Ver
+        </a>
+    </div>
 
-<table>
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(m => m.First().Kitap.KitapAdi)</th>
-            <th>@Html.DisplayNameFor(m => m.First().Ogrenci.OgrenciAdi)</th>
-            <th>@Html.DisplayNameFor(m => m.First().OduncAlmaTarihi)</th>
-            <th>@Html.DisplayNameFor(m => m.First().TeslimTarihi)</th>
-            <th>@Html.DisplayNameFor(m => m.First().TeslimDurumu)</th>
-            <th>İşlem</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Kitap?.KitapAdi</td>
-                <td>@item.Ogrenci?.OgrenciAdi</td>
-                <td>@item.OduncAlmaTarihi.ToShortDateString()</td>
-                <td>@item.TeslimTarihi?.ToShortDateString()</td>
-                <td>
-                    @if (item.TeslimDurumu)
-                    {
-                        <span class="badge bg-success">Teslim Edildi</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-warning">Ödünç Alındı</span>
-                    }
-                </td>
-                <td>
-                    @if (!item.TeslimDurumu)
-                    {
-                        <a asp-action="TeslimAl" asp-route-id="@item.Id" class="btn btn-success">Teslim Al</a>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Kitap</th>
+                            <th>Öğrenci</th>
+                            <th>Alınma Tarihi</th>
+                            <th>Teslim Tarihi</th>
+                            <th>Durum</th>
+                            <th class="text-end">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var odunc in Model)
+                        {
+                            <tr>
+                                <td>@odunc.Id</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-info text-white me-2">
+                                            <i class="fas fa-book"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-medium">@odunc.Kitap.KitapAdi</div>
+                                            <small class="text-muted">@odunc.Kitap.Yazar</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-primary text-white me-2">
+                                            @odunc.Ogrenci.OgrenciAdi[0]@odunc.Ogrenci.OgrenciSoyadi[0]
+                                        </div>
+                                        <div>
+                                            <div class="fw-medium">@odunc.Ogrenci.OgrenciAdi @odunc.Ogrenci.OgrenciSoyadi</div>
+                                            <small class="text-muted">@odunc.Ogrenci.OkulNumarasi</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@odunc.OduncAlmaTarihi.ToString("dd.MM.yyyy")</td>
+                                <td>
+                                    @if (odunc.TeslimTarihi.HasValue)
+                                    {
+                                        <span>@odunc.TeslimTarihi.Value.ToString("dd.MM.yyyy")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (odunc.TeslimTarihi.HasValue)
+                                    {
+                                        <span class="badge bg-success">Teslim Edildi</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">Ödünç Verildi</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    @if (!odunc.TeslimTarihi.HasValue)
+                                    {
+                                        <a href="/Odunc/TeslimAl/@odunc.Id" class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-check"></i>
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Ver" class="btn btn-primary">➕ Yeni Ödünç Ver</a>
-</p>
+<style>
+    .avatar-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+</style>
 
-<script>
-    const cursor = document.createElement('div');
-    cursor.classList.add('custom-cursor');
-    document.body.appendChild(cursor);
-
-    document.addEventListener('mousemove', e => {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
-    });
-
-    document.querySelectorAll('a, button').forEach(el => {
-        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
-        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
-    });
-</script>
+@section Scripts {
+    <script>
+        // Enable tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+}
