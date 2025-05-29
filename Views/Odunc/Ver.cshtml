@@ -4,50 +4,80 @@
     ViewData["Title"] = "Kitap Ödünç Ver";
 }
 
-<h1>Kitap Ödünç Ver</h1>
-<hr />
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-book-reader me-2"></i>@ViewData["Title"]
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form id="oduncForm">
+                        @Html.AntiForgeryToken()
+                        <div id="alertArea"></div>
 
-<div style="max-width: 600px;">
-    <form id="oduncForm">
-        @Html.AntiForgeryToken()
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <!-- Kitap Arama -->
+                        <div class="mb-4">
+                            <label for="kitapArama" class="form-label">Kitap Ara</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-book"></i>
+                                </span>
+                                <input type="text" id="kitapArama" class="form-control" placeholder="Kitap adı veya yazar adı yazın..." autocomplete="off" />
+                            </div>
+                            <div id="kitapSonuclari" class="list-group mt-2" style="display:none;"></div>
+                            <div id="seciliKitap" class="alert alert-success mt-2" style="display:none;">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <div>
+                                        <strong>Seçili Kitap:</strong>
+                                        <span id="seciliKitapAdi"></span>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="kitapId" />
+                            </div>
+                        </div>
 
-        <!-- Kitap Arama -->
-        <div class="mb-3">
-            <label for="kitapArama">Kitap Ara</label>
-            <input type="text" id="kitapArama" class="form-control" placeholder="Kitap adı yazın..." autocomplete="off" />
-            <div id="kitapSonuclari" class="list-group" style="display:none; margin-top:6px;"></div>
-            <div id="seciliKitap" class="alert alert-success mt-2" style="display:none;">
-                <strong>Seçili Kitap:</strong> <span id="seciliKitapAdi"></span>
-                <input type="hidden" asp-for="KitapId" id="kitapId" />
+                        <!-- Öğrenci Arama -->
+                        <div class="mb-4">
+                            <label for="ogrenciArama" class="form-label">Öğrenci Ara</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user-graduate"></i>
+                                </span>
+                                <input type="text" id="ogrenciArama" class="form-control" placeholder="Öğrenci adı veya okul numarası yazın..." autocomplete="off" />
+                            </div>
+                            <div id="ogrenciSonuclari" class="list-group mt-2" style="display:none;"></div>
+                            <div id="seciliOgrenci" class="alert alert-success mt-2" style="display:none;">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <div>
+                                        <strong>Seçili Öğrenci:</strong>
+                                        <span id="seciliOgrenciAdi"></span>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="ogrenciId" />
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-primary" id="tamamlaBtn" disabled>
+                                <i class="fas fa-check me-2"></i>Tamamla
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Listeye Dön
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-
-        <!-- Öğrenci Arama -->
-        <div class="mb-3">
-            <label for="ogrenciArama">Öğrenci Ara</label>
-            <input type="text" id="ogrenciArama" class="form-control" placeholder="Öğrenci adı veya soyadı yazın..." autocomplete="off" />
-            <div id="ogrenciSonuclari" class="list-group" style="display:none; margin-top:6px;"></div>
-            <div id="seciliOgrenci" class="alert alert-success mt-2" style="display:none;">
-                <strong>Seçili Öğrenci:</strong> <span id="seciliOgrenciAdi"></span>
-                <input type="hidden" asp-for="OgrenciId" id="ogrenciId" />
-            </div>
-        </div>
-
-        <div class="mt-4">
-            <button type="button" class="btn btn-primary" id="tamamlaBtn" disabled>
-                <i class="fas fa-check me-2"></i>Tamamla
-            </button>
-            <a asp-action="Index" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Listeye Dön
-            </a>
-        </div>
-    </form>
+    </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-
     <script>
         $(document).ready(function () {
             // Kitap arama
@@ -59,18 +89,26 @@
                         sonuclar.empty().show();
                         if (kitaplar && kitaplar.length > 0) {
                             kitaplar.forEach(function (kitap) {
-                                var disabled = kitap.oduncDurumu ? 'disabled' : '';
                                 sonuclar.append(`
-                                    <div class="list-group-item list-group-item-action ${disabled}" 
+                                    <div class="list-group-item list-group-item-action d-flex align-items-center p-3" 
                                          data-id="${kitap.id}" 
-                                         data-ad="${kitap.kitapAdi}">
-                                        ${kitap.kitapAdi} 
-                                        ${kitap.oduncDurumu ? '<span class="badge bg-danger float-end">Ödünç Verildi</span>' : ''}
+                                         data-ad="${kitap.ad}">
+                                        <i class="fas fa-book me-3 text-primary"></i>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-0">${kitap.ad}</h6>
+                                            <small class="text-muted">Kitap</small>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-muted"></i>
                                     </div>
                                 `);
                             });
                         } else {
-                            sonuclar.append('<div class="list-group-item">Sonuç bulunamadı.</div>');
+                            sonuclar.append(`
+                                <div class="list-group-item text-center p-3">
+                                    <i class="fas fa-search me-2"></i>
+                                    Sonuç bulunamadı
+                                </div>
+                            `);
                         }
                     });
                 } else {
@@ -162,26 +200,39 @@
                     },
                     success: function (response) {
                         if (response.success) {
-                            alert('Kitap başarıyla ödünç verildi.');
-                            window.location.href = '/Odunc';
+                            $('#alertArea').html(`
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-check-circle me-2"></i>${response.message}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            `);
+                            // Formu temizle
+                            $('#seciliKitap, #seciliOgrenci').hide();
+                            $('#kitapId, #ogrenciId').val('');
+                            $('#tamamlaBtn').prop('disabled', true);
+                            
+                            // 2 saniye sonra listeye yönlendir
+                            setTimeout(function() {
+                                window.location.href = '/Odunc/Index';
+                            }, 2000);
                         } else {
-                            alert('Bir hata oluştu: ' + response.message);
+                            $('#alertArea').html(`
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-exclamation-circle me-2"></i>${response.message}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            `);
                         }
                     },
                     error: function () {
-                        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+                        $('#alertArea').html(`
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>İşlem sırasında bir hata oluştu.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        `);
                     }
                 });
-            });
-
-            // Dışarı tıklandığında sonuçları gizle
-            $(document).on('click', function (e) {
-                if (!$(e.target).closest('#kitapArama, #kitapSonuclari').length) {
-                    $('#kitapSonuclari').hide();
-                }
-                if (!$(e.target).closest('#ogrenciArama, #ogrenciSonuclari').length) {
-                    $('#ogrenciSonuclari').hide();
-                }
             });
         });
     </script>

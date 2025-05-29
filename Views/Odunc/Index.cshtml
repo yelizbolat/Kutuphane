@@ -5,6 +5,22 @@
 }
 
 <div class="container py-4">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0">
             <i class="fas fa-book-reader me-2 text-primary"></i>@ViewData["Title"]
@@ -23,6 +39,7 @@
                             <th>#</th>
                             <th>Kitap</th>
                             <th>Öğrenci</th>
+                            <th>Sınıf Bilgisi</th>
                             <th>Alınma Tarihi</th>
                             <th>Teslim Tarihi</th>
                             <th>Durum</th>
@@ -40,21 +57,52 @@
                                             <i class="fas fa-book"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-medium">@odunc.Kitap.KitapAdi</div>
-                                            <small class="text-muted">@odunc.Kitap.Yazar</small>
+                                            <div class="fw-medium">@odunc.Kitap?.KitapAdi</div>
+                                            <small class="text-muted">@odunc.Kitap?.Yazar</small>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="avatar-circle bg-primary text-white me-2">
-                                            @odunc.Ogrenci.OgrenciAdi[0]@odunc.Ogrenci.OgrenciSoyadi[0]
+                                            @(odunc.Ogrenci != null 
+                                                ? $"{odunc.Ogrenci.OgrenciAdi[0]}{odunc.Ogrenci.OgrenciSoyadi[0]}" 
+                                                : "—")
                                         </div>
                                         <div>
-                                            <div class="fw-medium">@odunc.Ogrenci.OgrenciAdi @odunc.Ogrenci.OgrenciSoyadi</div>
-                                            <small class="text-muted">@odunc.Ogrenci.OkulNumarasi</small>
+                                            @if (odunc.Ogrenci != null)
+                                            {
+                                                <div class="fw-medium">@odunc.Ogrenci.OgrenciAdi @odunc.Ogrenci.OgrenciSoyadi</div>
+                                                <small class="text-muted">@odunc.Ogrenci.OkulNumarasi</small>
+                                            }
+                                            else
+                                            {
+                                                <div class="fw-medium text-danger">Silinmiş Öğrenci</div>
+                                                <small class="text-muted">-</small>
+                                            }
                                         </div>
                                     </div>
+                                </td>
+                                <td>
+                                    @if (odunc.Ogrenci?.Sinif != null)
+                                    {
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-secondary text-white me-2">
+                                                <i class="fas fa-users"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium">@odunc.Ogrenci.Sinif.SinifAdi</div>
+                                                @{
+                                                    var ogrenciSayisi = ViewBag.SinifOgrenciSayilari[odunc.Ogrenci.SinifId];
+                                                }
+                                                <small class="text-muted">@ogrenciSayisi öğrenci</small>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
                                 </td>
                                 <td>@odunc.OduncAlmaTarihi.ToString("dd.MM.yyyy")</td>
                                 <td>

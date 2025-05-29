@@ -26,6 +26,14 @@ namespace Kutuphane.Controllers
             return View(ogrenciler);
         }
 
+        public async Task<IActionResult> SilinenOgrenciler()
+        {
+            var silinenOgrenciler = await _context.SilinenOgrenciler
+                .OrderByDescending(s => s.SilinmeTarihi)
+                .ToListAsync();
+            return View(silinenOgrenciler);
+        }
+
         public async Task<IActionResult> Ekle()
         {
             ViewBag.Siniflar = new SelectList(await _context.Siniflar.ToListAsync(), "Id", "SinifAdi");
@@ -89,7 +97,7 @@ namespace Kutuphane.Controllers
             // Öğrencinin ödünç aldığı kitapları kontrol et
             var oduncKitaplar = await _context.OduncKitaplar
                 .Include(o => o.Kitap)
-                .Where(o => o.OgrenciId == id && o.TeslimTarihi == null)
+                .Where(o => o.OgrenciId == id && !o.TeslimDurumu)
                 .ToListAsync();
 
             ViewBag.OduncKitaplar = oduncKitaplar;
@@ -101,26 +109,58 @@ namespace Kutuphane.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SilOnayla(int id)
         {
-            var ogrenci = await _context.Ogrenciler.FindAsync(id);
-            if (ogrenci == null)
+            try
             {
-                return NotFound();
+                var ogrenci = await _context.Ogrenciler
+                    .Include(o => o.Sinif)
+                    .FirstOrDefaultAsync(o => o.Id == id);
+
+                if (ogrenci == null)
+                {
+                    return NotFound();
+                }
+
+                // Öğrencinin ödünç aldığı kitapları kontrol et
+                var oduncKitaplar = await _context.OduncKitaplar
+                    .Where(o => o.OgrenciId == id && !o.TeslimDurumu)
+                    .ToListAsync();
+
+                if (oduncKitaplar.Any())
+                {
+                    TempData["Hata"] = "Bu öğrencinin teslim etmediği kitaplar var. Önce kitapları teslim almalısınız.";
+                    return RedirectToAction(nameof(Sil), new { id });
+                }
+
+                // Silinen öğrenci bilgilerini kaydet
+                var silinenOgrenci = new SilinenOgrenci
+                {
+                    OgrenciAdi = ogrenci.OgrenciAdi,
+                    OgrenciSoyadi = ogrenci.OgrenciSoyadi,
+                    OkulNumarasi = ogrenci.OkulNumarasi,
+                    SinifAdi = ogrenci.Sinif?.SinifAdi ?? "Belirtilmemiş",
+                    SilinmeTarihi = DateTime.Now,
+                    SilenKullanici = User.Identity?.Name ?? "Sistem"
+                };
+
+                _context.SilinenOgrenciler.Add(silinenOgrenci);
+
+                // Öğrencinin sınıf bağlantısını kaldır
+                ogrenci.SinifId = null;
+                _context.Update(ogrenci);
+                await _context.SaveChangesAsync();
+
+                // Şimdi öğrenciyi sil
+                _context.Ogrenciler.Remove(ogrenci);
+                await _context.SaveChangesAsync();
+
+                TempData["Basari"] = "Öğrenci başarıyla silindi.";
+                return RedirectToAction(nameof(Index));
             }
-
-            // Öğrencinin ödünç aldığı kitapları kontrol et
-            var oduncKitaplar = await _context.OduncKitaplar
-                .Where(o => o.OgrenciId == id && o.TeslimTarihi == null)
-                .ToListAsync();
-
-            if (oduncKitaplar.Any())
+            catch (Exception ex)
             {
-                TempData["Hata"] = "Bu öğrencinin teslim etmediği kitaplar var. Önce kitapları teslim almalısınız.";
+                TempData["Hata"] = "Öğrenci silinirken bir hata oluştu: " + ex.Message;
                 return RedirectToAction(nameof(Sil), new { id });
             }
-
-            _context.Ogrenciler.Remove(ogrenci);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
     }   
 }

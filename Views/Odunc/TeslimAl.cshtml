@@ -10,65 +10,67 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-success text-white">
                     <h3 class="mb-0">
-                        <i class="fas fa-check-circle me-2"></i>@ViewData["Title"]
+                        <i class="fas fa-book-reader me-2"></i>@ViewData["Title"]
                     </h3>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>Bilgi:</strong> Kitabı teslim almak üzeresiniz.
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Dikkat!</strong> Bu kitabı teslim almak istediğinizden emin misiniz?
                     </div>
 
-                    <div class="mb-4">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-primary mb-3">
-                                            <i class="fas fa-book me-2"></i>Kitap Bilgileri
-                                        </h5>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <div class="avatar-circle bg-info text-white me-3">
-                                                <i class="fas fa-book"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-0">@Model.Kitap.KitapAdi</h6>
-                                                <small class="text-muted">@Model.Kitap.Yazar</small>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2">
-                                            <strong>Alınma Tarihi:</strong>
-                                            <span class="ms-2">@Model.OduncAlmaTarihi.ToString("dd.MM.yyyy")</span>
-                                        </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary mb-3">
+                                        <i class="fas fa-book me-2"></i>Kitap Bilgileri
+                                    </h5>
+                                    <div class="mb-2">
+                                        <strong>Kitap Adı:</strong>
+                                        <span class="ms-2">@Model.Kitap.KitapAdi</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <strong>Yazar:</strong>
+                                        <span class="ms-2">@Model.Kitap.Yazar</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <strong>Alınma Tarihi:</strong>
+                                        <span class="ms-2">@Model.OduncAlmaTarihi.ToString("dd.MM.yyyy HH:mm")</span>
+                                    </div>
+                                    <div>
+                                        <strong>Son Teslim Tarihi:</strong>
+                                        <span class="ms-2">@(Model.TeslimTarihi.HasValue ? Model.TeslimTarihi.Value.ToString("dd.MM.yyyy HH:mm") : "-")</span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-primary mb-3">
-                                            <i class="fas fa-user me-2"></i>Öğrenci Bilgileri
-                                        </h5>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <div class="avatar-circle bg-primary text-white me-3">
-                                                @Model.Ogrenci.OgrenciAdi[0]@Model.Ogrenci.OgrenciSoyadi[0]
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-0">@Model.Ogrenci.OgrenciAdi @Model.Ogrenci.OgrenciSoyadi</h6>
-                                                <small class="text-muted">@Model.Ogrenci.OkulNumarasi</small>
-                                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary mb-3">
+                                        <i class="fas fa-user me-2"></i>Öğrenci Bilgileri
+                                    </h5>
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="avatar-circle bg-primary text-white me-3">
+                                            @Model.Ogrenci.OgrenciAdi[0]@Model.Ogrenci.OgrenciSoyadi[0]
                                         </div>
-                                        <div class="mb-2">
-                                            <strong>Sınıf:</strong>
-                                            <span class="badge bg-info ms-2">@Model.Ogrenci.Sinif?.SinifAdi</span>
+                                        <div>
+                                            <h6 class="mb-0">@Model.Ogrenci.OgrenciAdi @Model.Ogrenci.OgrenciSoyadi</h6>
+                                            <small class="text-muted">@Model.Ogrenci.OkulNumarasi</small>
                                         </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <strong>Sınıf:</strong>
+                                        <span class="badge bg-info ms-2">@Model.Ogrenci.Sinif?.SinifAdi</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <form asp-action="TeslimAl" method="post">
+                    <form asp-action="TeslimAlOnay" method="post">
                         <input type="hidden" asp-for="Id" />
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-success">

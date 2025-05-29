@@ -26,7 +26,17 @@ namespace Kutuphane.Controllers
             var oduncKitaplar = await _context.OduncKitaplar
                 .Include(o => o.Kitap)
                 .Include(o => o.Ogrenci)
+                    .ThenInclude(o => o.Sinif)
                 .ToListAsync();
+
+            // Her sınıf için öğrenci sayısını hesapla
+            var sinifOgrenciSayilari = await _context.Ogrenciler
+                .GroupBy(o => o.SinifId)
+                .Select(g => new { SinifId = g.Key, OgrenciSayisi = g.Count() })
+                .ToDictionaryAsync(x => x.SinifId, x => x.OgrenciSayisi);
+
+            ViewBag.SinifOgrenciSayilari = sinifOgrenciSayilari;
+
             return View(oduncKitaplar);
         }
 
@@ -34,6 +44,46 @@ namespace Kutuphane.Controllers
         public IActionResult Ver()
         {
             return View();
+        }
+
+        // Öğrenci arama API'si
+        [HttpGet]
+        public async Task<IActionResult> OgrenciAra(string arama)
+        {
+            if (string.IsNullOrWhiteSpace(arama))
+                return Json(new List<object>());
+
+            var ogrenciler = await _context.Ogrenciler
+                .Where(o => (o.OgrenciAdi + " " + o.OgrenciSoyadi).Contains(arama) || o.OkulNumarasi.Contains(arama))
+                .Select(o => new
+                {
+                    id = o.Id,
+                    adSoyad = o.OgrenciAdi + " " + o.OgrenciSoyadi
+                })
+                .Take(5)
+                .ToListAsync();
+
+            return Json(ogrenciler);
+        }
+
+        // Kitap arama API'si
+        [HttpGet]
+        public async Task<IActionResult> KitapAra(string arama)
+        {
+            if (string.IsNullOrWhiteSpace(arama))
+                return Json(new List<object>());
+
+            var kitaplar = await _context.Kitaplar
+                .Where(k => k.KitapAdi.Contains(arama) || k.Yazar.Contains(arama))
+                .Select(k => new
+                {
+                    id = k.Id,
+                    ad = k.KitapAdi + " - " + k.Yazar
+                })
+                .Take(5)
+                .ToListAsync();
+
+            return Json(kitaplar);
         }
 
         // POST: Odunc/Ver
@@ -51,31 +101,40 @@ namespace Kutuphane.Controllers
                     return Json(new { success = false, message = "Lütfen kitap ve öğrenci seçiniz." });
                 }
 
+                // Öğrencinin teslim etmediği kitap var mı kontrol et
+                var teslimEdilmeyenKitapSayisi = await _context.OduncKitaplar
+                    .Where(o => o.OgrenciId == oduncKitap.OgrenciId && !o.TeslimDurumu)
+                    .CountAsync();
+
+                if (teslimEdilmeyenKitapSayisi > 0)
+                {
+                    return Json(new { 
+                        success = false, 
+                        message = "Bu öğrencinin teslim etmediği kitap bulunmaktadır. Yeni kitap almak için önce diğer kitabı teslim etmelidir." 
+                    });
+                }
+
                 // Kitabın ödünç verilip verilmediğini kontrol et
                 var kitapOduncDurumu = await _context.OduncKitaplar
                     .AnyAsync(o => o.KitapId == oduncKitap.KitapId && !o.TeslimDurumu);
 
                 if (kitapOduncDurumu)
                 {
-                    _logger.LogWarning("Kitap zaten ödünç verilmiş. KitapId: {KitapId}", oduncKitap.KitapId);
-                    return Json(new { success = false, message = "Bu kitap zaten ödünç verilmiş." });
+                    return Json(new { success = false, message = "Bu kitap şu anda başka bir öğrencide bulunmaktadır." });
                 }
 
                 oduncKitap.OduncAlmaTarihi = DateTime.Now;
+                oduncKitap.TeslimTarihi = DateTime.Now.AddDays(15); // 15 günlük ödünç süresi
                 oduncKitap.TeslimDurumu = false;
 
-                _context.OduncKitaplar.Add(oduncKitap);
+                await _context.OduncKitaplar.AddAsync(oduncKitap);
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation("Kitap başarıyla ödünç verildi. KitapId: {KitapId}, OgrenciId: {OgrenciId}", 
-                    oduncKitap.KitapId, oduncKitap.OgrenciId);
-
-                return Json(new { success = true });
+                return Json(new { success = true, message = "Kitap başarıyla ödünç verildi." });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Kitap ödünç verme işleminde hata oluştu. KitapId: {KitapId}, OgrenciId: {OgrenciId}", 
-                    oduncKitap.KitapId, oduncKitap.OgrenciId);
+                _logger.LogError(ex, "Kitap ödünç verme işlemi sırasında hata oluştu");
                 return Json(new { success = false, message = "Bir hata oluştu: " + ex.Message });
             }
         }
@@ -92,6 +151,7 @@ namespace Kutuphane.Controllers
                 .Include(o => o.Kitap)
                 .Include(o => o.Ogrenci)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (oduncKitap == null)
             {
                 return NotFound();
@@ -101,52 +161,44 @@ namespace Kutuphane.Controllers
         }
 
         // POST: Odunc/TeslimAl/5
-        [HttpPost, ActionName("TeslimAl")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> TeslimAlOnayla(int id)
+        public async Task<IActionResult> TeslimAlOnay(int id)
         {
-            var oduncKitap = await _context.OduncKitaplar.FindAsync(id);
-            if (oduncKitap != null)
+            try
             {
+                var oduncKitap = await _context.OduncKitaplar
+                    .Include(o => o.Kitap)
+                    .Include(o => o.Ogrenci)
+                    .FirstOrDefaultAsync(m => m.Id == id);
+
+                if (oduncKitap == null)
+                {
+                    TempData["Error"] = "Kitap bulunamadı.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                if (oduncKitap.TeslimDurumu)
+                {
+                    TempData["Error"] = "Bu kitap zaten teslim edilmiş.";
+                    return RedirectToAction(nameof(Index));
+                }
+
                 oduncKitap.TeslimDurumu = true;
                 oduncKitap.TeslimTarihi = DateTime.Now;
+
                 _context.Update(oduncKitap);
                 await _context.SaveChangesAsync();
+
+                TempData["Success"] = $"{oduncKitap.Kitap.KitapAdi} kitabı başarıyla teslim alındı.";
+                return RedirectToAction(nameof(Index));
             }
-            return RedirectToAction(nameof(Index));
-        }
-
-        // AJAX: Kitap arama
-        public async Task<IActionResult> KitapAra(string arama)
-        {
-            var kitaplar = await _context.Kitaplar
-                .Where(k => k.KitapAdi.Contains(arama))
-                .Select(k => new
-                {
-                    id = k.Id,
-                    kitapAdi = k.KitapAdi,
-                    oduncDurumu = _context.OduncKitaplar.Any(o => o.KitapId == k.Id && !o.TeslimDurumu)
-                })
-                .Take(10)
-                .ToListAsync();
-
-            return Json(kitaplar);
-        }
-
-        // AJAX: Öğrenci arama
-        public async Task<IActionResult> OgrenciAra(string arama)
-        {
-            var ogrenciler = await _context.Ogrenciler
-                .Where(o => o.OgrenciAdi.Contains(arama) || o.OgrenciSoyadi.Contains(arama))
-                .Select(o => new
-                {
-                    id = o.Id,
-                    adSoyad = o.OgrenciAdi + " " + o.OgrenciSoyadi
-                })
-                .Take(10)
-                .ToListAsync();
-
-            return Json(ogrenciler);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Kitap teslim alma işlemi sırasında hata oluştu");
+                TempData["Error"] = "Kitap teslim alma işlemi sırasında bir hata oluştu.";
+                return RedirectToAction(nameof(Index));
+            }
         }
     }
 } 

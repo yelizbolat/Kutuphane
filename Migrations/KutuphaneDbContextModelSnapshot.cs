@@ -166,6 +166,40 @@ namespace Kutuphane.Migrations
                     b.ToTable("Ogrenciler");
                 });
 
+            modelBuilder.Entity("Kutuphane.Models.SilinenOgrenci", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("OgrenciAdi")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OgrenciSoyadi")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OkulNumarasi")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SilenKullanici")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("SilinmeTarihi")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SinifAdi")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SilinenOgrenciler");
+                });
+
             modelBuilder.Entity("Kutuphane.Models.Sinif", b =>
                 {
                     b.Property<int>("Id")
@@ -199,12 +233,13 @@ namespace Kutuphane.Migrations
                     b.HasOne("Kutuphane.Models.Kitap", "Kitap")
                         .WithMany()
                         .HasForeignKey("KitapId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Kutuphane.Models.Ogrenci", "Ogrenci")
                         .WithMany()
-                        .HasForeignKey("OgrenciId");
+                        .HasForeignKey("OgrenciId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Kitap");
 

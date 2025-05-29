@@ -16,9 +16,8 @@ namespace Kutuphane.Data
         public DbSet<Kitap> Kitaplar { get; set; }
         public DbSet<OduncKitap> OduncKitaplar { get; set; }
         public DbSet<Kullanici> Kullanicilar { get; set; }
+        public DbSet<SilinenOgrenci> SilinenOgrenciler { get; set; }
 
-        
-        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Kitap>()
@@ -32,6 +31,19 @@ namespace Kutuphane.Data
                 .WithMany(s => s.Ogrenciler)
                 .HasForeignKey(o => o.SinifId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OduncKitap>()
+                .HasOne(ok => ok.Ogrenci)
+                .WithMany()
+                .HasForeignKey(ok => ok.OgrenciId)
+                .OnDelete(DeleteBehavior.SetNull); // Öğrenci silinince OgrenciId null olur
+
+            modelBuilder.Entity<OduncKitap>()
+                .HasOne(ok => ok.Kitap)
+                .WithMany()
+                .HasForeignKey(ok => ok.KitapId)
+                .OnDelete(DeleteBehavior.Restrict); // Kitap silinemez, önce ödünç kayıtları silinmeli
         }
+
     }
 }

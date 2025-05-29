@@ -4,6 +4,7 @@ using Kutuphane.Models;
 using Kutuphane.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Kutuphane.Models.ViewModels;
 
 namespace Kutuphane.Controllers;
 
@@ -20,7 +21,16 @@ public class SinifController : Controller
     // GET: Sinif
     public async Task<IActionResult> Index()
     {
-        var siniflar  = await _context.Siniflar.OrderBy(s => s.SinifAdi).ToListAsync();
+        var siniflar = await _context.Siniflar
+            .Include(s => s.Ogrenciler)
+            .Select(s => new SinifViewModel
+            {
+                Id = s.Id,
+                SinifAdi = s.SinifAdi,
+                OgrenciSayisi = s.Ogrenciler.Count
+            })
+            .ToListAsync();
+
         return View(siniflar);
     }
 
@@ -39,6 +49,7 @@ public class SinifController : Controller
         {
             await _context.Siniflar.AddAsync(sinif);
             await _context.SaveChangesAsync();
+            TempData["Success"] = "Sınıf başarıyla eklendi.";
             return RedirectToAction(nameof(Index));
         }
         return View(sinif);
@@ -69,6 +80,7 @@ public class SinifController : Controller
         {
             _context.Siniflar.Update(sinif);
             await _context.SaveChangesAsync();
+            TempData["Success"] = "Sınıf başarıyla güncellendi.";
             return RedirectToAction(nameof(Index));
         }
         return View(sinif);
@@ -87,10 +99,12 @@ public class SinifController : Controller
         {
             _context.Siniflar.Remove(sinif);
             await _context.SaveChangesAsync();
+            TempData["Success"] = "Sınıf başarıyla silindi.";
             return RedirectToAction(nameof(Index));
         }
         else
         {
+            TempData["Error"] = "Sınıf bulunamadı.";
             return NotFound();
         }   
     }   

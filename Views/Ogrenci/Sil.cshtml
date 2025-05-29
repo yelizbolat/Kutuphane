@@ -14,10 +14,34 @@
                     </h3>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        <strong>Dikkat!</strong> Bu öğrenciyi silmek istediğinizden emin misiniz?
-                    </div>
+                    @if (TempData["Hata"] != null)
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            @TempData["Hata"]
+                        </div>
+                    }
+
+                    @if (ViewBag.OduncKitaplar != null && ViewBag.OduncKitaplar.Count > 0)
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Dikkat!</strong> Bu öğrencinin teslim etmediği kitaplar var:
+                            <ul class="mt-2 mb-0">
+                                @foreach (var odunc in ViewBag.OduncKitaplar)
+                                {
+                                    <li>@odunc.Kitap.KitapAdi</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Dikkat!</strong> Bu öğrenciyi silmek istediğinizden emin misiniz?
+                        </div>
+                    }
 
                     <div class="mb-4">
                         <div class="d-flex align-items-center mb-3">
@@ -34,31 +58,6 @@
                             <span class="badge bg-info">@Model.Sinif?.SinifAdi</span>
                         </div>
                     </div>
-
-                    @if (ViewBag.OduncKitaplar != null && ViewBag.OduncKitaplar.Count > 0)
-                    {
-                        <div class="alert alert-danger">
-                            <h5 class="alert-heading">
-                                <i class="fas fa-exclamation-circle me-2"></i>
-                                Ödünç Alınmış Kitaplar
-                            </h5>
-                            <p class="mb-2">Bu öğrencinin teslim etmediği kitaplar var. Önce kitapları teslim almalısınız.</p>
-                            <div class="list-group mt-3">
-                                @foreach (var kitap in ViewBag.OduncKitaplar)
-                                {
-                                    <div class="list-group-item list-group-item-danger d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <i class="fas fa-book me-2"></i>
-                                            @kitap.Kitap.KitapAdi
-                                        </div>
-                                        <small class="text-muted">
-                                            Alınma: @kitap.OduncAlmaTarihi.ToString("dd.MM.yyyy")
-                                        </small>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    }
 
                     <form asp-action="Sil" method="post">
                         <input type="hidden" asp-for="Id" />
