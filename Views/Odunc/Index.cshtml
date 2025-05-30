@@ -116,7 +116,7 @@
                                     }
                                 </td>
                                 <td>
-                                    @if (odunc.TeslimTarihi.HasValue)
+                                    @if (odunc.TeslimDurumu)
                                     {
                                         <span class="badge bg-success">Teslim Edildi</span>
                                     }
@@ -126,7 +126,7 @@
                                     }
                                 </td>
                                 <td class="text-end">
-                                    @if (!odunc.TeslimTarihi.HasValue)
+                                    @if (!odunc.TeslimDurumu)
                                     {
                                         <a href="/Odunc/TeslimAl/@odunc.Id" class="btn btn-sm btn-outline-success">
                                             <i class="fas fa-check"></i>

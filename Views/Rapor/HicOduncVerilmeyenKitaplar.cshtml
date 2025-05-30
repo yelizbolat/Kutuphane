@@ -1,0 +1,35 @@
+@model IEnumerable<Kutuphane.Models.ViewModels.KitapViewModel>
+@{
+    ViewData["Title"] = "Hiç Ödünç Verilmeyen Kitaplar";
+}
+<h2 class="mb-4">Hiç Ödünç Verilmeyen Kitaplar</h2>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Kitap Adı</th>
+            <th>Yazar</th>
+            <th>Kategori</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr><td colspan="4" class="text-center">Kayıt bulunamadı.</td></tr>
+        }
+        else
+        {
+            int sira = 1;
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@sira</td>
+                    <td>@item.KitapAdi</td>
+                    <td>@item.Yazar</td>
+                    <td>@item.Kategori</td>
+                </tr>
+                sira++;
+            }
+        }
+    </tbody>
+</table> 

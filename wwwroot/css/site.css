@@ -203,8 +203,7 @@ body {
 
 /* Footer Styles */
 .footer {
-    background-color: var(--dark-color);
-    color: white;
+    color: var(--secondary-color);
     padding: 1rem 0;
     margin-top: 2rem;
 }

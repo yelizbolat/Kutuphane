@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Kutuphane.Data; // Adjust namespace based on your project structure
 using Kutuphane.Models; // Adjust namespace based on your models
+using Kutuphane.Models.ViewModels; // Add this line for ViewModels
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
@@ -146,14 +147,11 @@ namespace Kutuphane.Controllers
 
                 // Öğrencinin sınıf bağlantısını kaldır
                 ogrenci.SinifId = null;
+                ogrenci.Aktif = false;
                 _context.Update(ogrenci);
                 await _context.SaveChangesAsync();
 
-                // Şimdi öğrenciyi sil
-                _context.Ogrenciler.Remove(ogrenci);
-                await _context.SaveChangesAsync();
-
-                TempData["Basari"] = "Öğrenci başarıyla silindi.";
+                TempData["Basari"] = "Öğrenci başarıyla pasif hale getirildi.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -161,6 +159,60 @@ namespace Kutuphane.Controllers
                 TempData["Hata"] = "Öğrenci silinirken bir hata oluştu: " + ex.Message;
                 return RedirectToAction(nameof(Sil), new { id });
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Detaylar(int id)
+        {
+            var ogrenci = await _context.Ogrenciler
+                .Include(o => o.Sinif)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (ogrenci == null)
+            {
+                return NotFound();
+            }
+
+            // Öğrencinin ödünç aldığı kitapları getir
+            var oduncKitaplar = await _context.OduncKitaplar
+                .Include(o => o.Kitap)
+                .Where(o => o.OgrenciId == id)
+                .OrderByDescending(o => o.OduncAlmaTarihi)
+                .ToListAsync();
+
+            var viewModel = new OgrenciDetayViewModel
+            {
+                Id = ogrenci.Id,
+                OgrenciAdi = ogrenci.OgrenciAdi,
+                OgrenciSoyadi = ogrenci.OgrenciSoyadi,
+                OkulNumarasi = ogrenci.OkulNumarasi,
+                SinifAdi = ogrenci.Sinif?.SinifAdi ?? "Belirtilmemiş",
+                OduncKitaplar = oduncKitaplar.Select(o => new OgrenciOduncKitapViewModel
+                {
+                    KitapAdi = o.Kitap.KitapAdi,
+                    Yazar = o.Kitap.Yazar,
+                    AlinmaTarihi = o.OduncAlmaTarihi,
+                    TeslimTarihi = o.TeslimTarihi,
+                    TeslimDurumu = o.TeslimDurumu
+                }).ToList()
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> IzactifGuncelle()
+        {
+            var silinenOgrenciNumaralari = await _context.SilinenOgrenciler.Select(x => x.OkulNumarasi).ToListAsync();
+            var silinenOgrenciler = await _context.Ogrenciler.Where(x => silinenOgrenciNumaralari.Contains(x.OkulNumarasi)).ToListAsync();
+            foreach (var ogr in silinenOgrenciler)
+            {
+                ogr.Aktif = false;
+            }
+            await _context.SaveChangesAsync();
+            TempData["Basari"] = "Silinen öğrenciler pasif hale getirildi.";
+            return RedirectToAction("Index");
         }
     }   
 }

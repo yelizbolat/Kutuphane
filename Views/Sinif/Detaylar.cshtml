@@ -1,0 +1,189 @@
+@model Kutuphane.Models.ViewModels.SinifDetayViewModel
+
+@{
+    ViewData["Title"] = "Sınıf Detayları";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>@ViewData["Title"]
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="avatar-circle bg-primary text-white me-3">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0">@Model.SinifAdi</h4>
+                            <small class="text-muted">Sınıf ID: @Model.Id</small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-user-graduate me-2"></i>Öğrenci Bilgileri
+                                    </h5>
+                                    <div class="d-flex align-items-center mt-3">
+                                        <div class="display-4 me-3">@Model.OgrenciSayisi</div>
+                                        <div>
+                                            <div class="text-muted">Toplam Öğrenci</div>
+                                            @{
+                                                var dolulukOrani = Model.OgrenciSayisi * 100 / 40; // Varsayılan maksimum 40 öğrenci
+                                                var progressClass = dolulukOrani switch
+                                                {
+                                                    <= 25 => "bg-success",
+                                                    <= 50 => "bg-info",
+                                                    <= 75 => "bg-warning",
+                                                    _ => "bg-danger"
+                                                };
+                                            }
+                                            <div class="progress mt-2" style="height: 8px; width: 100px;">
+                                                <div class="progress-bar @progressClass" role="progressbar" 
+                                                     style="width: @dolulukOrani%;" 
+                                                     aria-valuenow="@dolulukOrani" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Öğrenci Listesi -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="fas fa-users me-2"></i>Öğrenci Listesi
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Ad Soyad</th>
+                                            <th>Okul Numarası</th>
+                                            <th class="text-end">İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var ogrenci in Model.Ogrenciler)
+                                        {
+                                            <tr>
+                                                <td>@ogrenci.Id</td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-circle bg-primary text-white me-2">
+                                                            @ogrenci.OgrenciAdi[0]
+                                                        </div>
+                                                        <div class="fw-medium">@ogrenci.OgrenciAdi @ogrenci.OgrenciSoyadi</div>
+                                                    </div>
+                                                </td>
+                                                <td>@ogrenci.OkulNumarasi</td>
+                                                <td class="text-end">
+                                                    <a href="/Ogrenci/Detaylar/@ogrenci.Id" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ödünç Alınan Kitaplar -->
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="fas fa-book me-2"></i>Ödünç Alınan Kitaplar
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Öğrenci</th>
+                                            <th>Kitap</th>
+                                            <th>Alınma Tarihi</th>
+                                            <th>Teslim Tarihi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.OduncKitaplar.Any())
+                                        {
+                                            foreach (var kitap in Model.OduncKitaplar)
+                                            {
+                                                <tr>
+                                                    <td>@kitap.OgrenciAdi</td>
+                                                    <td>@kitap.KitapAdi</td>
+                                                    <td>@kitap.AlinmaTarihi.ToString("dd.MM.yyyy")</td>
+                                                    <td>
+                                                        @if (kitap.TeslimDurumu)
+                                                        {
+                                                            <span class="badge bg-success">@kitap.TeslimTarihi?.ToString("dd.MM.yyyy")</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-warning">Teslim Edilmedi</span>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="4" class="text-center py-4">
+                                                    <div class="text-muted">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        Bu sınıfta ödünç alınmış kitap bulunmamaktadır.
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <a asp-action="Guncelle" asp-route-id="@Model.Id" class="btn btn-primary">
+                            <i class="fas fa-edit me-2"></i>Düzenle
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Listeye Dön
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+</style> 

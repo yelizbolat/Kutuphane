@@ -330,7 +330,6 @@ C:\Users\yeliz601\Desktop\MVC\Kutuphane\obj\Debug\net9.0\Kutuphane.sourcelink.js
 C:\Users\yeliz601\Desktop\MVC\Kutuphane\obj\Debug\net9.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\yeliz601\Desktop\MVC\Kutuphane\obj\Debug\net9.0\scopedcss\bundle\Kutuphane.styles.css
 C:\Users\yeliz601\Desktop\MVC\Kutuphane\obj\Debug\net9.0\scopedcss\projectbundle\Kutuphane.bundle.scp.css
-C:\Users\yeliz601\Desktop\MVC\Kutuphane\obj\Debug\net9.0\compressed\c5dd2oh8c9-w6hnez42ab.gz
 C:\Users\yeliz601\Desktop\MVC\Kutuphane\obj\Debug\net9.0\compressed\6lnjfobtbh-61n19gt1b8.gz
 C:\Users\yeliz601\Desktop\MVC\Kutuphane\obj\Debug\net9.0\compressed\1bbxtuljdi-xtxxf3hu2r.gz
 C:\Users\yeliz601\Desktop\MVC\Kutuphane\obj\Debug\net9.0\compressed\qog7yi4s10-t1cqhe9u97.gz
@@ -441,3 +440,4 @@ C:\Users\bolat\OneDrive\Masaüstü\mvc\Kutuphane\obj\Debug\net9.0\compressed\qv2
 C:\Users\bolat\OneDrive\Masaüstü\mvc\Kutuphane\obj\Debug\net9.0\compressed\xpm6hqcrjj-jjsuc0puko.gz
 C:\Users\bolat\OneDrive\Masaüstü\mvc\Kutuphane\obj\Debug\net9.0\compressed\anvd8j6146-9vr69e8ynj.gz
 C:\Users\bolat\OneDrive\Masaüstü\mvc\Kutuphane\obj\Debug\net9.0\compressed\c5dd2oh8c9-w6hnez42ab.gz
+C:\Users\yeliz601\Desktop\MVC\Kutuphane\obj\Debug\net9.0\compressed\c5dd2oh8c9-xdkghv5v9b.gz

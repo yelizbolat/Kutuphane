@@ -2,39 +2,23 @@
     ViewData["Title"] = "Raporlar";
 }
 
-<div class="container">
-    <h2 class="mb-4"><i class="fas fa-chart-bar me-2"></i>Raporlar</h2>
-
-    <div class="row">
-
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="fas fa-user-graduate me-2"></i>En Çok Okuyan Öğrenciler
-                    </h5>
-                    <p class="card-text">En çok kitap okuyan öğrencilerin sıralaması.</p>
-                    <a asp-action="EnCokOkuyanOgrenciler" class="btn btn-primary">
-                        <i class="fas fa-arrow-right me-2"></i>Görüntüle
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="fas fa-book me-2"></i>En Çok Okunan Kitaplar
-                    </h5>
-                    <p class="card-text">En çok ödünç alınan kitapların sıralaması.</p>
-                    <a asp-action="EnCokOkunanKitaplar" class="btn btn-primary">
-                        <i class="fas fa-arrow-right me-2"></i>Görüntüle
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+<h2 class="mb-4">Raporlar</h2>
+<div class="list-group">
+    <a href="@Url.Action("EnCokOkuyanOgrencilerFiltreli", "Rapor")" class="list-group-item list-group-item-action">
+        En Çok Okuyan Öğrenciler (Tarih ve Sınıf Filtreli)
+    </a>
+    <a href="@Url.Action("EnCokOkunanKitaplarFiltreli", "Rapor")" class="list-group-item list-group-item-action">
+        En Çok Okunan Kitaplar (Tarih ve Sınıf Filtreli)
+    </a>
+    <a href="@Url.Action("EnCokOduncVerilenKitapTurleri", "Rapor")" class="list-group-item list-group-item-action">
+        En Çok Ödünç Verilen Kitap Türüne Göre Rapor (Sınıf Filtreli)
+    </a>
+    <a href="@Url.Action("HicKitapOkumayanOgrenciler", "Rapor")" class="list-group-item list-group-item-action">
+        Hiç Kitap Okumayan Öğrenciler (Sınıf Filtreli)
+    </a>
+    <a href="@Url.Action("HicOduncVerilmeyenKitaplar", "Rapor")" class="list-group-item list-group-item-action">
+        Hiç Ödünç Verilmeyen Kitaplar
+    </a>
 </div>
 
 @section Scripts {

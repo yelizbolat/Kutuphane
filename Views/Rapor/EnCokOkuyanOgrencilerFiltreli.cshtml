@@ -1,0 +1,64 @@
+@model IEnumerable<Kutuphane.Models.ViewModels.OgrenciOkumaRaporuViewModel>
+@{
+    ViewData["Title"] = "En Çok Okuyan Öğrenciler";
+}
+<h2 class="mb-4">En Çok Okuyan Öğrenciler</h2>
+<form method="get" class="row g-3 mb-3">
+    <div class="col-auto">
+        <label for="baslangic" class="form-label">Başlangıç Tarihi</label>
+        <input type="date" id="baslangic" name="baslangic" class="form-control" value="@ViewBag.Baslangic" />
+    </div>
+    <div class="col-auto">
+        <label for="bitis" class="form-label">Bitiş Tarihi</label>
+        <input type="date" id="bitis" name="bitis" class="form-control" value="@ViewBag.Bitis" />
+    </div>
+    <div class="col-auto">
+        <label for="sinifId" class="form-label">Sınıf</label>
+        <select id="sinifId" name="sinifId" class="form-select">
+            @foreach (var sinif in (IEnumerable<SelectListItem>)ViewBag.Siniflar)
+            {
+                if (ViewBag.SelectedSinif != null && sinif.Value == ViewBag.SelectedSinif.ToString())
+                {
+                    <option value="@sinif.Value" selected="selected">@sinif.Text</option>
+                }
+                else
+                {
+                    <option value="@sinif.Value">@sinif.Text</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-primary">Filtrele</button>
+    </div>
+</form>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Adı</th>
+            <th>Soyadı</th>
+            <th>Okuma Sayısı</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr><td colspan="4" class="text-center">Kayıt bulunamadı.</td></tr>
+        }
+        else
+        {
+            int sira = 1;
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@sira</td>
+                    <td>@item.OgrenciAdi</td>
+                    <td>@item.OgrenciSoyadi</td>
+                    <td>@item.OkumaSayisi</td>
+                </tr>
+                sira++;
+            }
+        }
+    </tbody>
+</table> 

@@ -86,6 +86,55 @@ public class SinifController : Controller
         return View(sinif);
     }
 
+    // GET: Sinif/Details/5
+    public async Task<IActionResult> Detaylar(int? id)
+    {
+        if (id == null || id == 0)
+        {
+            return NotFound();
+        }
+
+        var sinif = await _context.Siniflar
+            .Include(s => s.Ogrenciler)
+            .FirstOrDefaultAsync(s => s.Id == id);
+
+        if (sinif == null)
+        {
+            return NotFound();
+        }
+
+        // Öğrencilerin ödünç aldığı kitapları getir
+        var ogrenciOduncKitaplar = await _context.OduncKitaplar
+            .Include(o => o.Kitap)
+            .Include(o => o.Ogrenci)
+            .Where(o => o.Ogrenci.SinifId == id)
+            .ToListAsync();
+
+        var viewModel = new SinifDetayViewModel
+        {
+            Id = sinif.Id,
+            SinifAdi = sinif.SinifAdi,
+            OgrenciSayisi = sinif.Ogrenciler.Count,
+            Ogrenciler = sinif.Ogrenciler.Select(o => new SinifOgrenciViewModel
+            {
+                Id = o.Id,
+                OgrenciAdi = o.OgrenciAdi,
+                OgrenciSoyadi = o.OgrenciSoyadi,
+                OkulNumarasi = o.OkulNumarasi
+            }).ToList(),
+            OduncKitaplar = ogrenciOduncKitaplar.Select(o => new OduncKitapViewModel
+            {
+                OgrenciAdi = $"{o.Ogrenci.OgrenciAdi} {o.Ogrenci.OgrenciSoyadi}",
+                KitapAdi = o.Kitap.KitapAdi,
+                AlinmaTarihi = o.OduncAlmaTarihi,
+                TeslimTarihi = o.TeslimDurumu ? o.TeslimTarihi : null,
+                TeslimDurumu = o.TeslimDurumu
+            }).ToList()
+        };
+
+        return View(viewModel);
+    }
+
     // GET: Sinif/Delete/5
     public async Task<IActionResult> Sil(int? id)
     {
