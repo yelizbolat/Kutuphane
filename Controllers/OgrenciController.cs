@@ -21,10 +21,18 @@ namespace Kutuphane.Controllers
         // GET: Ogrenci
         public async Task<IActionResult> Index()
         {
-            var ogrenciler = await _context.Ogrenciler
-            .Include(o => o.Sinif) // Sinif navigasyonunu doldur
-            .ToListAsync();
-            return View(ogrenciler);
+            var aktifOgrenciler = await _context.Ogrenciler
+                .Include(o => o.Sinif)
+                .Where(o => o.Aktif)
+                .ToListAsync();
+
+            var pasifOgrenciler = await _context.Ogrenciler
+                .Include(o => o.Sinif)
+                .Where(o => !o.Aktif)
+                .ToListAsync();
+
+            ViewBag.PasifOgrenciler = pasifOgrenciler;
+            return View(aktifOgrenciler);
         }
 
         public async Task<IActionResult> SilinenOgrenciler()
@@ -82,7 +90,6 @@ namespace Kutuphane.Controllers
             return RedirectToAction("Index");
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Sil(int id)
         {
@@ -132,7 +139,10 @@ namespace Kutuphane.Controllers
                     return RedirectToAction(nameof(Sil), new { id });
                 }
 
-                // Silinen öğrenci bilgilerini kaydet
+                // Öğrenciyi silmek yerine pasif hale getir
+                ogrenci.Aktif = false;
+
+                // Silinen öğrenci kaydını tut
                 var silinenOgrenci = new SilinenOgrenci
                 {
                     OgrenciAdi = ogrenci.OgrenciAdi,
@@ -144,10 +154,6 @@ namespace Kutuphane.Controllers
                 };
 
                 _context.SilinenOgrenciler.Add(silinenOgrenci);
-
-                // Öğrencinin sınıf bağlantısını kaldır
-                ogrenci.SinifId = null;
-                ogrenci.Aktif = false;
                 _context.Update(ogrenci);
                 await _context.SaveChangesAsync();
 
@@ -159,6 +165,20 @@ namespace Kutuphane.Controllers
                 TempData["Hata"] = "Öğrenci silinirken bir hata oluştu: " + ex.Message;
                 return RedirectToAction(nameof(Sil), new { id });
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GeriAl(int id)
+        {
+            var ogrenci = await _context.Ogrenciler.FindAsync(id);
+            if (ogrenci != null)
+            {
+                ogrenci.Aktif = true;
+                _context.Ogrenciler.Update(ogrenci);
+                await _context.SaveChangesAsync();
+                TempData["Basari"] = "Öğrenci başarıyla geri alındı.";
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
@@ -199,6 +219,7 @@ namespace Kutuphane.Controllers
 
             return View(viewModel);
         }
+
 
         [HttpPost]
         [Authorize(Roles = "Admin")]

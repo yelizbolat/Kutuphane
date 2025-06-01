@@ -19,10 +19,16 @@
         </div>
     </div>
 
-    <div class="card shadow-sm">
+    <!-- Aktif Öğrenciler -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                <i class="fas fa-user-check me-2 text-success"></i>Aktif Öğrenciler
+            </h5>
+        </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover align-middle">
+                <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
                             <th>#</th>
@@ -33,32 +39,48 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var ogrenci in Model)
+                        @if (Model.Any())
+                        {
+                            @foreach (var ogrenci in Model)
+                            {
+                                <tr>
+                                    <td>@ogrenci.Id</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-primary text-white me-2">
+                                                @ogrenci.OgrenciAdi[0]@ogrenci.OgrenciSoyadi[0]
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium">@ogrenci.OgrenciAdi @ogrenci.OgrenciSoyadi</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@ogrenci.OkulNumarasi</td>
+                                    <td>
+                                        <span class="badge bg-info">@ogrenci.Sinif?.SinifAdi</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group">
+                                            <a href="/Ogrenci/Detaylar/@ogrenci.Id" class="btn btn-sm btn-outline-info" title="Detaylar">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                            <a href="/Ogrenci/Guncelle/@ogrenci.Id" class="btn btn-sm btn-outline-primary" title="Düzenle">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="/Ogrenci/Sil/@ogrenci.Id" class="btn btn-sm btn-outline-danger" title="Sil">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
                         {
                             <tr>
-                                <td>@ogrenci.Id</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-circle bg-primary text-white me-2">
-                                            @ogrenci.OgrenciAdi[0]@ogrenci.OgrenciSoyadi[0]
-                                        </div>
-                                        <div>
-                                            <div class="fw-medium">@ogrenci.OgrenciAdi @ogrenci.OgrenciSoyadi</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>@ogrenci.OkulNumarasi</td>
-                                <td>
-                                    <span class="badge bg-info">@ogrenci.Sinif?.SinifAdi</span>
-                                </td>
-                                <td class="text-end">
-                                    <div class="btn-group">
-                                        <a href="/Ogrenci/Guncelle/@ogrenci.Id" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="/Ogrenci/Sil/@ogrenci.Id" class="btn btn-sm btn-outline-danger">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
+                                <td colspan="5" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="fas fa-info-circle me-2"></i>Aktif öğrenci bulunmamaktadır.
                                     </div>
                                 </td>
                             </tr>
@@ -68,6 +90,62 @@
             </div>
         </div>
     </div>
+
+    <!-- Pasif Öğrenciler -->
+    @if (ViewBag.PasifOgrenciler != null && ((List<Ogrenci>)ViewBag.PasifOgrenciler).Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-times me-2 text-danger"></i>Pasif Öğrenciler
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Ad Soyad</th>
+                                <th>Okul Numarası</th>
+                                <th>Sınıf</th>
+                                <th class="text-end">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ogrenci in (List<Ogrenci>)ViewBag.PasifOgrenciler)
+                            {
+                                <tr>
+                                    <td>@ogrenci.Id</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-secondary text-white me-2">
+                                                @ogrenci.OgrenciAdi[0]@ogrenci.OgrenciSoyadi[0]
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium">@ogrenci.OgrenciAdi @ogrenci.OgrenciSoyadi</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@ogrenci.OkulNumarasi</td>
+                                    <td>
+                                        <span class="badge bg-secondary">@ogrenci.Sinif?.SinifAdi</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <form asp-action="GeriAl" asp-route-id="@ogrenci.Id" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-success" title="Geri Al">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
 <style>
