@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Kutuphane.Models
 {
+    [Index(nameof(OkulNumarasi), IsUnique = true)]
     public class Ogrenci{
         public int Id { get; set; }
         

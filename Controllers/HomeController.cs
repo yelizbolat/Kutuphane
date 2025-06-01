@@ -18,7 +18,7 @@ public class HomeController : Controller
     public async Task<IActionResult> Index()
     {
         var teslimEdilmeyenKitaplar = await _context.OduncKitaplar
-            .Where(o => o.OduncAlmaTarihi.AddDays(7) < DateTime.Now && o.TeslimDurumu == false)
+            .Where(o => o.OduncAlmaTarihi.AddDays(1) < DateTime.Now && o.TeslimDurumu == false)
             .Include(o => o.Kitap)
             .Include(o => o.Ogrenci)
             .Select(o => new KitapOduncIslemleri
@@ -27,7 +27,7 @@ public class HomeController : Controller
                 OgrenciAdi = o.Ogrenci.OgrenciAdi + " " + o.Ogrenci.OgrenciSoyadi,
                 KitapAdi = o.Kitap.KitapAdi,
                 AlinmaTarihi = o.OduncAlmaTarihi,
-                TeslimTarihi = o.OduncAlmaTarihi.AddDays(7),
+                TeslimTarihi = o.OduncAlmaTarihi.AddDays(1),
                 GercekTeslimTarihi = o.TeslimTarihi,
                 OduncKitap = o
             })

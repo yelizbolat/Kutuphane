@@ -53,13 +53,25 @@ namespace Kutuphane.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Ekle(Ogrenci ogrenci)
         {
-             if (ModelState.IsValid)
+            if (ModelState.IsValid)
             {
+                // Okul numarasının benzersiz olup olmadığını kontrol et
+                var numaraKontrol = await _context.Ogrenciler
+                    .AnyAsync(o => o.OkulNumarasi == ogrenci.OkulNumarasi);
+
+                if (numaraKontrol)
+                {
+                    ModelState.AddModelError("OkulNumarasi", "Bu okul numarası başka bir öğrenci tarafından kullanılıyor.");
+                    ViewBag.Siniflar = new SelectList(await _context.Siniflar.ToListAsync(), "Id", "SinifAdi");
+                    return View(ogrenci);
+                }
+
                 _context.Ogrenciler.Add(ogrenci);
                 await _context.SaveChangesAsync();
+                TempData["Basari"] = "Öğrenci başarıyla eklendi.";
                 return RedirectToAction("Index");
             }
-           ViewBag.Siniflar = new SelectList(await _context.Siniflar.ToListAsync(), "Id", "SinifAdi");
+            ViewBag.Siniflar = new SelectList(await _context.Siniflar.ToListAsync(), "Id", "SinifAdi");
             return View(ogrenci);
         }
 
@@ -85,9 +97,35 @@ namespace Kutuphane.Controllers
                 return View(ogrenci);
             }
 
-            _context.Update(ogrenci);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            // Okul numarasının başka bir öğrenci tarafından kullanılıp kullanılmadığını kontrol et
+            var numaraKontrol = await _context.Ogrenciler
+                .AnyAsync(o => o.OkulNumarasi == ogrenci.OkulNumarasi && o.Id != ogrenci.Id);
+
+            if (numaraKontrol)
+            {
+                ModelState.AddModelError("OkulNumarasi", "Bu okul numarası başka bir öğrenci tarafından kullanılıyor.");
+                ViewBag.Siniflar = new SelectList(await _context.Siniflar.ToListAsync(), "Id", "SinifAdi");
+                return View(ogrenci);
+            }
+
+            try
+            {
+                _context.Update(ogrenci);
+                await _context.SaveChangesAsync();
+                TempData["Basari"] = "Öğrenci başarıyla güncellendi.";
+                return RedirectToAction("Index");
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await _context.Ogrenciler.AnyAsync(o => o.Id == ogrenci.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         [HttpGet]
